@@ -1,0 +1,241 @@
+:root {
+  --surface-background-opacity: 0.9;
+  --surface-outset: 12px;
+  --system-surface-border: rgb(255 255 255 / 0.2);
+  --system-surface-highlight: rgb(255 255 255 / 0.12);
+  --system-surface-shadow: 0 4px 8px -2px rgb(0 0 0 / 0.24), 0 1px 3px rgb(0 0 0 / 0.14);
+  --nested-menu-background: rgb(25 27 24 / var(--surface-background-opacity));
+  --nested-menu-blur: blur(34px) saturate(1.28);
+  font-family: Inter, "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+  color: #f7f5ee;
+  background: transparent;
+  color-scheme: dark light;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  width: 100%;
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  min-width: 0;
+  min-height: 0;
+  /* 真实 Electron 窗口只承载固定尺寸的透明面板，页面级滚动会把滚动条露在桌面边缘。 */
+  overflow: hidden;
+  background: transparent;
+}
+
+body.menu-preview-route {
+  width: calc(var(--menu-panel-width, 320px) + var(--surface-outset, 12px) * 2);
+  height: calc(var(--menu-panel-height, 470px) + var(--surface-outset, 12px) * 2);
+}
+
+body.menu-floating-route {
+  width: 100vw;
+  height: 100vh;
+  overscroll-behavior: contain;
+}
+
+button,
+input,
+select {
+  font: inherit;
+}
+
+button:focus,
+button:focus-visible,
+input:focus,
+input:focus-visible,
+select:focus,
+select:focus-visible {
+  outline: none;
+  box-shadow: none;
+}
+
+button {
+  border: 0;
+  border-radius: var(--control-radius, 7px);
+  padding: 7px 10px;
+  color: var(--text);
+  background: var(--control);
+  cursor: pointer;
+  transition:
+    color var(--motion-fast, 140ms) var(--motion-ease, ease),
+    background var(--motion-fast, 140ms) var(--motion-ease, ease),
+    border-color var(--motion-fast, 140ms) var(--motion-ease, ease),
+    opacity var(--motion-fast, 140ms) var(--motion-ease, ease),
+    transform var(--motion-fast, 140ms) var(--motion-ease, ease);
+}
+
+button:hover {
+  background: var(--control-hover);
+  transform: translateY(-1px);
+}
+
+button:active {
+  transform: translateY(0);
+}
+
+button:disabled {
+  cursor: default;
+  opacity: 0.62;
+  transform: none;
+}
+
+input:not([type='checkbox']),
+select {
+  width: 100%;
+  min-width: 0;
+  border: 0;
+  border-radius: var(--control-radius-small, 6px);
+  padding: 6px 8px;
+  color: var(--text);
+  transition:
+    border-color var(--motion-fast, 140ms) var(--motion-ease, ease),
+    background var(--motion-fast, 140ms) var(--motion-ease, ease),
+    box-shadow var(--motion-fast, 140ms) var(--motion-ease, ease),
+    opacity var(--motion-fast, 140ms) var(--motion-ease, ease);
+}
+
+input:not([type='checkbox']) {
+  background: transparent;
+}
+
+select {
+  background: var(--field);
+}
+
+input[type='number'] {
+  appearance: textfield;
+  -moz-appearance: textfield;
+}
+
+input[type='number']::-webkit-outer-spin-button,
+input[type='number']::-webkit-inner-spin-button {
+  margin: 0;
+  appearance: none;
+  -webkit-appearance: none;
+}
+
+input[type='checkbox'] {
+  position: relative;
+  display: grid;
+  flex: 0 0 17px;
+  place-items: center;
+  width: 17px;
+  height: 17px;
+  min-width: 17px;
+  margin: 0;
+  padding: 0;
+  appearance: none !important;
+  -webkit-appearance: none !important;
+  border: 1px solid var(--checkbox-border);
+  border-radius: var(--control-radius-small, 6px);
+  color: var(--accent-contrast);
+  background: var(--checkbox-background);
+  background-clip: padding-box;
+  box-sizing: border-box;
+  cursor: pointer;
+  outline: none;
+  transition:
+    background var(--motion-fast, 140ms) var(--motion-ease, ease),
+    border-color var(--motion-fast, 140ms) var(--motion-ease, ease),
+    box-shadow var(--motion-fast, 140ms) var(--motion-ease, ease),
+    opacity var(--motion-fast, 140ms) var(--motion-ease, ease);
+}
+
+input[type='checkbox']:focus {
+  outline: none;
+}
+
+input[type='checkbox']:hover:not(:disabled) {
+  background: var(--checkbox-hover);
+}
+
+input[type='checkbox']:focus-visible {
+  box-shadow: 0 0 0 3px var(--accent-soft);
+}
+
+input[type='checkbox']:checked {
+  border-color: var(--accent);
+  background: var(--accent);
+}
+
+input[type='checkbox']:checked:hover:not(:disabled) {
+  border-color: color-mix(in srgb, var(--accent) 82%, #000000);
+  background: color-mix(in srgb, var(--accent) 82%, #000000);
+}
+
+input[type='checkbox']:checked:active:not(:disabled) {
+  border-color: color-mix(in srgb, var(--accent) 72%, #000000);
+  background: color-mix(in srgb, var(--accent) 72%, #000000);
+}
+
+input[type='checkbox']:checked::after {
+  width: 4px;
+  height: 8px;
+  border-right: 2px solid currentColor;
+  border-bottom: 2px solid currentColor;
+  content: '';
+  transform: translateY(-1px) rotate(45deg);
+}
+
+input[type='checkbox']:disabled {
+  cursor: default;
+  opacity: 0.45;
+}
+
+input:not([type='checkbox']):disabled {
+  color: var(--muted);
+  opacity: 0.72;
+}
+
+.motion-presence {
+  transform-origin: top center;
+  will-change: opacity, transform, clip-path;
+}
+
+.motion-enter {
+  animation: ui-presence-enter var(--motion-duration, 180ms) var(--motion-ease, ease-out) both;
+}
+
+.motion-exit {
+  pointer-events: none;
+  animation: ui-presence-exit var(--motion-duration, 180ms) var(--motion-ease, ease-out) both;
+}
+
+@keyframes ui-presence-enter {
+  from {
+    opacity: 0;
+    clip-path: inset(0 0 100% 0 round 8px);
+    transform: translateY(-6px) scale(0.985);
+  }
+
+  to {
+    opacity: 1;
+    clip-path: inset(0 0 0 0 round 8px);
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes ui-presence-exit {
+  from {
+    opacity: 1;
+    clip-path: inset(0 0 0 0 round 8px);
+    transform: translateY(0) scale(1);
+  }
+
+  to {
+    opacity: 0;
+    clip-path: inset(0 0 100% 0 round 8px);
+    transform: translateY(-5px) scale(0.985);
+  }
+}
+

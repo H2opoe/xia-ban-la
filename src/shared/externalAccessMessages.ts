@@ -22,7 +22,7 @@ export function getExternalAccessInstruction(kind: ExternalAccessKind, status: E
   return `无法读取本机${readableName}。请打开 ${settingsPath}，确认“${APP_NAME}”已允许访问后再重试。`;
 }
 
-export function getExternalAccessSettingsPath(kind: ExternalAccessKind) {
+function getExternalAccessSettingsPath(kind: ExternalAccessKind) {
   return `系统设置 > 隐私与安全性 > ${getPermissionName(kind)}`;
 }
 

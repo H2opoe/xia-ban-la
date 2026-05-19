@@ -1,0 +1,366 @@
+.primary-card-action {
+  color: var(--accent-contrast);
+  background: var(--accent);
+}
+
+.primary-card-action:hover {
+  color: var(--accent-contrast);
+  background: color-mix(in srgb, var(--accent) 88%, #ffffff);
+}
+
+.settings-popover {
+  position: absolute;
+  right: 0;
+  top: 36px;
+  display: grid;
+  gap: 3px;
+  width: 160px;
+  padding: 5px;
+  transform-origin: right top;
+}
+
+.floating-menu-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: 7px;
+  width: 100%;
+  min-height: var(--menu-option-height);
+  padding: 6px 8px;
+  border-radius: var(--control-radius);
+  color: var(--text);
+  background: transparent;
+  font-size: var(--font-body);
+  text-align: left;
+}
+
+.floating-menu-row:hover,
+.floating-menu-row.floating-menu-row-hovered,
+.floating-menu-group:hover > .floating-menu-row,
+.floating-menu-group > .floating-menu-row.floating-menu-row-hovered,
+.floating-menu-group.submenu-open > .floating-menu-row,
+.settings-menu-group.submenu-open > .settings-menu-row,
+.compact-menu-row.submenu-open,
+.compact-menu-row.floating-menu-row-hovered {
+  background: var(--control-hover);
+}
+
+.floating-menu-row:disabled {
+  cursor: default;
+  opacity: 0.58;
+}
+
+.floating-menu-row span,
+.floating-menu-row small {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.settings-menu-row small,
+.settings-menu-arrow {
+  color: var(--muted);
+  font-size: var(--font-caption);
+}
+
+.settings-menu-arrow {
+  grid-column: 3;
+  justify-self: center;
+  width: 12px;
+  font-size: var(--font-secondary-title);
+  line-height: 1;
+  text-align: center;
+}
+
+.settings-switch-row {
+  cursor: default;
+}
+
+.settings-switch-row input {
+  flex: 0 0 17px;
+}
+
+.floating-menu-group,
+.settings-menu-group {
+  position: relative;
+  min-width: 0;
+}
+
+.floating-menu-surface {
+  display: grid;
+  opacity: 0;
+  pointer-events: none;
+  visibility: hidden;
+  transform: translateY(5px) scale(0.97);
+  transition:
+    opacity var(--motion-duration, 0.18s) var(--motion-ease, ease-out),
+    transform var(--motion-duration, 0.18s) var(--motion-ease, ease-out),
+    visibility 0s linear var(--motion-duration, 0.18s);
+}
+
+.floating-menu-surface.is-open {
+  opacity: 1;
+  pointer-events: auto;
+  visibility: visible;
+  transform: translateY(0) scale(1);
+  transition-delay: 0s;
+}
+
+.floating-menu-surface::after {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 14px;
+  content: "";
+}
+
+.floating-menu-surface[data-placement='left-top']::after,
+.settings-display-submenu::after,
+.settings-lock-submenu::after,
+.settings-theme-submenu::after,
+.settings-about-submenu::after {
+  right: -14px;
+}
+
+.floating-menu-surface[data-placement='right-top']::after,
+.context-submenu::after,
+.tertiary-submenu::after {
+  left: -14px;
+}
+
+.settings-display-submenu,
+.settings-lock-submenu,
+.settings-theme-submenu,
+.settings-about-submenu {
+  position: absolute;
+  top: 0;
+  right: calc(100% + 8px);
+  z-index: var(--z-submenu);
+  display: grid;
+  gap: 3px;
+  width: 210px;
+  padding: 5px;
+  transform-origin: top right;
+}
+
+.settings-theme-submenu {
+  width: 105px;
+}
+
+.settings-display-submenu.is-open,
+.settings-lock-submenu.is-open,
+.settings-theme-submenu.is-open,
+.settings-about-submenu.is-open {
+  opacity: 1;
+  pointer-events: auto;
+  visibility: visible;
+  transform: translateY(0) scale(1);
+  transition-delay: 0s;
+}
+
+.off-work-message-submenu {
+  gap: 7px;
+  width: 238px;
+  max-height: 280px;
+}
+
+.settings-about-submenu {
+  gap: 7px;
+  box-sizing: border-box;
+  width: 100%;
+  max-height: calc(100vh - 16px);
+  overflow: auto;
+  overscroll-behavior: contain;
+  padding: 9px 10px;
+}
+
+.settings-lock-submenu {
+  gap: 7px;
+  padding: 8px;
+}
+
+.settings-display-submenu {
+  gap: 7px;
+  max-height: 220px;
+  overflow: auto;
+  overscroll-behavior: contain;
+  padding: 8px;
+}
+
+.settings-display-row {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: 7px;
+  width: 100%;
+  min-width: 0;
+  min-height: var(--menu-option-height);
+  border-radius: var(--control-radius);
+  color: var(--text);
+}
+
+.settings-display-row span,
+.settings-display-empty {
+  display: block;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.settings-display-empty {
+  color: var(--muted);
+  font-size: var(--font-caption);
+}
+
+.settings-lock-options {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 6px;
+}
+
+.settings-lock-options button {
+  justify-content: center;
+  min-height: var(--menu-option-height);
+  padding: 6px 8px;
+  border-radius: var(--control-radius);
+  color: var(--text);
+  background: var(--control);
+  text-align: center;
+}
+
+.settings-lock-options button:hover {
+  background: var(--control-hover);
+}
+
+.settings-lock-options button.selected {
+  color: var(--accent-contrast);
+  background: var(--accent);
+}
+
+.settings-lock-description {
+  display: grid;
+  grid-template-columns: 15px minmax(0, 1fr);
+  align-items: start;
+  gap: 5px;
+  margin: 0;
+  color: var(--muted);
+  font-size: var(--font-caption);
+  line-height: 1.45;
+}
+
+.settings-description-icon {
+  width: 14px;
+  height: 14px;
+  margin-top: 1px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.settings-about-row {
+  display: flex;
+  align-items: baseline;
+  min-width: 0;
+  color: var(--text);
+  font-size: var(--font-body);
+  line-height: 1.45;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.settings-about-link {
+  flex: 0 1 auto;
+  min-width: max-content;
+  min-height: 0;
+  padding: 0;
+  border-radius: 0;
+  color: inherit;
+  background: transparent;
+  cursor: pointer;
+  font: inherit;
+  text-align: left;
+  text-decoration: none;
+  vertical-align: top;
+  white-space: nowrap;
+}
+
+.settings-about-link:hover,
+.settings-about-link:active {
+  color: inherit;
+  background: transparent;
+  text-decoration: none;
+  transform: none;
+}
+
+.settings-message-list {
+  display: grid;
+  gap: 6px;
+  max-height: 244px;
+  overflow: auto;
+  overscroll-behavior: contain;
+}
+
+.settings-message-row {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) 36px;
+  align-items: center;
+  gap: 6px;
+  color: var(--text);
+}
+
+.settings-message-row input[type='text'] {
+  height: var(--menu-option-height);
+  padding: 5px 7px;
+  font-size: var(--font-body);
+}
+
+.settings-message-row button {
+  min-height: var(--menu-option-height);
+  padding: 5px 7px;
+  border-radius: var(--control-radius);
+  color: var(--danger);
+  background: transparent;
+}
+
+.settings-message-row button:hover {
+  background: color-mix(in srgb, var(--danger) 14%, transparent);
+}
+
+.settings-message-actions {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 6px;
+  padding-top: 6px;
+  border-top: 1px solid var(--hairline);
+}
+
+.settings-message-actions button {
+  min-height: var(--menu-option-height);
+  padding: 6px 8px;
+}
+
+.settings-theme-submenu button {
+  justify-content: flex-start;
+  min-height: var(--menu-option-height);
+  padding: 6px;
+  border-radius: var(--control-radius-small);
+  color: var(--text);
+  background: transparent;
+  text-align: left;
+  white-space: nowrap;
+}
+
+.settings-theme-submenu button:hover {
+  background: var(--control-hover);
+}
+
+.settings-theme-submenu button.selected {
+  color: var(--accent-contrast);
+  background: var(--accent);
+}
+

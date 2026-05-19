@@ -51,7 +51,8 @@ final class StatusBarDelegate: NSObject, NSApplicationDelegate {
         }
 
         image.size = NSSize(width: 18, height: 18)
-        image.isTemplate = false
+        // 这里必须使用模板图标，否则白色 SVG 在浅色菜单栏里会看起来像入口消失。
+        image.isTemplate = true
         statusItem?.length = NSStatusItem.squareLength
         statusItem?.button?.title = ""
         statusItem?.button?.image = image

@@ -1,0 +1,345 @@
+.menu-panel {
+  position: relative;
+  display: grid;
+  grid-template-rows: auto auto minmax(0, 1fr) auto auto;
+  gap: var(--surface-gap);
+  min-height: 0;
+  padding: 12px 12px 10px;
+  border: 1px solid var(--system-surface-border);
+  border-radius: 18px;
+  background: var(--panel);
+  box-shadow: var(--system-surface-shadow), inset 0 1px 0 var(--system-surface-highlight);
+  backdrop-filter: blur(22px) saturate(1.2);
+  -webkit-backdrop-filter: blur(22px) saturate(1.2);
+}
+
+.menu-panel > .reminders-section {
+  position: absolute;
+  top: 152px;
+  right: 12px;
+  bottom: 54px;
+  left: 12px;
+}
+
+.menu-panel-no-off-work > .reminders-section {
+  top: 120px;
+}
+
+.menu-panel > .menu-footer {
+  position: absolute;
+  right: 12px;
+  bottom: 10px;
+  left: 12px;
+  height: 42px;
+}
+
+.menu-header,
+.off-work-section {
+  animation: panel-content-enter var(--motion-duration, 180ms) var(--motion-ease, ease-out) both;
+}
+
+.off-work-section {
+  animation-delay: 28ms;
+}
+
+.menu-shell-exiting .menu-header,
+.menu-shell-exiting .off-work-section {
+  animation: panel-content-exit var(--motion-duration, 180ms) var(--motion-ease, ease-out) both;
+}
+
+@keyframes panel-content-enter {
+  from {
+    opacity: 0;
+    transform: translateY(7px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes panel-content-exit {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  to {
+    opacity: 0;
+    transform: translateY(-5px);
+  }
+}
+
+.menu-header {
+  display: grid;
+  gap: 5px;
+  padding-right: 38px;
+  padding-bottom: 0;
+  border-bottom: 0;
+}
+
+.menu-header > *,
+.reminders-section > * {
+  transition: opacity var(--motion-duration, 180ms) var(--motion-ease, ease-out);
+}
+
+.off-work-expanded-panel {
+  grid-template-rows: auto auto minmax(0, 1fr) auto auto;
+  gap: var(--surface-gap);
+  padding-top: 12px;
+}
+
+.off-work-expanded-panel .menu-header {
+  pointer-events: none;
+}
+
+.off-work-expanded-panel .reminders-section {
+  min-height: 0;
+  pointer-events: none;
+}
+
+.off-work-expanded-panel .menu-header > *,
+.off-work-expanded-panel .reminders-section > * {
+  opacity: 0.2;
+}
+
+.menu-header h1 {
+  margin: 0;
+  font-size: var(--font-app-title);
+  line-height: 1.25;
+  letter-spacing: 0;
+}
+
+.menu-header p {
+  margin: 0;
+  color: var(--muted);
+  font-size: var(--font-body);
+  line-height: 1.25;
+}
+
+.menu-header span,
+.menu-row small,
+.external-row small,
+.empty-state {
+  color: var(--muted);
+  font-size: var(--font-caption);
+}
+
+.off-work-section {
+  display: grid;
+  position: relative;
+  z-index: var(--z-panel-content);
+}
+
+.off-work-expanded-panel .off-work-section {
+  height: 83px;
+}
+
+.off-work-item-expanded {
+  position: absolute;
+  top: -50px;
+  right: 0;
+  left: 0;
+  z-index: var(--z-popover);
+  gap: 0;
+  padding: 0 0 calc(var(--action-button-height) + 10px + var(--card-control-gap) - var(--card-submenu-padding));
+  border: 1px solid var(--system-surface-border);
+  border-radius: var(--nested-menu-radius);
+  background: transparent;
+  box-shadow: var(--nested-menu-shadow), inset 0 1px 0 var(--system-surface-highlight);
+  isolation: isolate;
+  /* 三级菜单会从下班卡片右侧浮出，卡片本身不能裁剪这类浮层。 */
+  overflow: hidden;
+}
+
+.off-work-item-adding {
+  padding-bottom: 0;
+}
+
+.off-work-item-expanded::before {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  background: var(--nested-menu-background);
+  backdrop-filter: var(--nested-menu-blur);
+  -webkit-backdrop-filter: var(--nested-menu-blur);
+  content: "";
+}
+
+.countdown-card {
+  position: relative;
+  display: grid;
+  gap: 4px;
+  width: 100%;
+  min-height: 78px;
+  padding: 12px 11px;
+  border-radius: var(--row-radius);
+  background: var(--control);
+  text-align: left;
+}
+
+.off-work-item-expanded .countdown-card {
+  border-radius: 0;
+  background: transparent;
+}
+
+.countdown-card-main {
+  display: grid;
+  gap: 4px;
+  width: 100%;
+  padding: 0;
+  border-radius: 0;
+  background: transparent;
+  text-align: left;
+}
+
+.countdown-card-main:hover {
+  background: transparent;
+  transform: none;
+}
+
+.off-work-card-actions {
+  position: absolute;
+  right: 10px;
+  bottom: 10px;
+  left: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--card-control-gap);
+}
+
+.menu-action-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  min-width: 86px;
+  min-height: var(--action-button-height);
+  padding: 0 11px;
+  border-radius: var(--control-radius);
+  background: var(--control);
+  font-size: var(--font-caption);
+  font-weight: 650;
+  line-height: 1;
+}
+
+.menu-action-button:hover {
+  background: var(--control-hover);
+}
+
+.menu-action-button .button-icon {
+  width: 14px;
+  height: 14px;
+  stroke-width: 2;
+}
+
+.off-work-item-expanded .submenu {
+  position: relative;
+  z-index: var(--z-inline-surface);
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  overflow: visible;
+}
+
+.off-work-item-expanded .submenu::before {
+  position: absolute;
+  top: 0;
+  right: 9px;
+  bottom: auto;
+  left: 9px;
+  z-index: auto;
+  height: 1px;
+  border-radius: 0;
+  background: var(--hairline);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  content: "";
+}
+
+.countdown-label {
+  color: var(--muted);
+  font-size: var(--font-caption);
+}
+
+.countdown-main-row {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 10px;
+  min-width: 0;
+}
+
+.countdown-card strong {
+  font-size: var(--font-countdown);
+  line-height: 1.05;
+  letter-spacing: 0;
+}
+
+.rolling-countdown {
+  display: inline-flex;
+  align-items: center;
+  font-size: var(--font-countdown);
+  font-weight: 700;
+  line-height: 1.1;
+  font-variant-numeric: tabular-nums;
+  /* 大号数字的字形底部偏高，向下微调以贴齐右侧说明文字底部。 */
+  transform: translateY(3px);
+}
+
+.rolling-digit-frame,
+.rolling-static-char {
+  display: inline-grid;
+  place-items: center;
+  height: 1.05em;
+}
+
+.rolling-digit-frame {
+  width: 0.62em;
+  overflow: hidden;
+}
+
+.rolling-static-char {
+  width: 0.34em;
+}
+
+.rolling-digit {
+  animation: digit-roll var(--motion-duration, 180ms) var(--motion-ease, ease-out);
+}
+
+@keyframes digit-roll {
+  from {
+    opacity: 0.35;
+    transform: translateY(-0.82em);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.countdown-meta {
+  flex: 0 0 auto;
+  display: grid;
+  gap: 4px;
+  align-self: flex-end;
+  justify-items: end;
+  max-width: 128px;
+}
+
+.countdown-meta small {
+  max-width: 100%;
+  overflow: hidden;
+  color: var(--muted);
+  font-size: var(--font-caption);
+  line-height: 1.15;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

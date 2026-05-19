@@ -9,8 +9,6 @@ export const DEFAULT_MESSAGES = [
   '保存文件，准备下班',
   '伸个懒腰，准备下班'
 ];
-const DEFAULT_WORK_WEEK_DAYS = [1, 2, 3, 4, 5];
-
 export function createId(prefix: string) {
   return `${prefix}_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
 }
