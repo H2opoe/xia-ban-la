@@ -1,0 +1,95 @@
+{
+  "name": "xia-ban-la",
+  "version": "0.1.0",
+  "description": "下班啦 - 双平台全屏提醒软件",
+  "private": true,
+  "main": "dist-electron/main/main.js",
+  "type": "module",
+  "scripts": {
+    "dev": "concurrently -k \"npm:dev:renderer\" \"npm:dev:main\" \"npm:dev:electron\"",
+    "dev:renderer": "vite --host 127.0.0.1",
+    "dev:main": "npm run build:native && tsc -p tsconfig.electron.json --watch --preserveWatchOutput",
+    "dev:electron": "wait-on http://127.0.0.1:5173 dist-electron/main/main.js && cross-env VITE_DEV_SERVER_URL=http://127.0.0.1:5173 electron .",
+    "build": "npm run build:main && npm run build:renderer",
+    "build:native": "node scripts/build-native.cjs",
+    "build:main": "npm run build:native && tsc -p tsconfig.electron.json",
+    "build:renderer": "vite build",
+    "typecheck": "tsc --noEmit && tsc -p tsconfig.electron.json --noEmit",
+    "package": "npm run build && electron-builder"
+  },
+  "dependencies": {
+    "@vitejs/plugin-react": "^5.0.0",
+    "vite": "^7.0.0",
+    "typescript": "^5.8.3",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0",
+    "concurrently": "^9.1.2",
+    "wait-on": "^8.0.3",
+    "cross-env": "^7.0.3"
+  },
+  "devDependencies": {
+    "electron": "^36.3.2",
+    "electron-builder": "^26.0.12",
+    "@types/node": "^22.15.21",
+    "@types/react": "^19.1.5",
+    "@types/react-dom": "^19.1.5"
+  },
+  "build": {
+    "appId": "com.xiabanla.app",
+    "productName": "下班啦",
+    "icon": "build/icon.png",
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "dist/**/*",
+      "dist-electron/**/*",
+      "package.json"
+    ],
+    "extraResources": [
+      {
+        "from": "build/icon.png",
+        "to": "icons/icon.png"
+      },
+      {
+        "from": "build/icon-dark.png",
+        "to": "icons/icon-dark.png"
+      },
+      {
+        "from": "build/tray.svg",
+        "to": "icons/tray.svg"
+      }
+    ],
+    "mac": {
+      "category": "public.app-category.productivity",
+      "icon": "build/icon.icns",
+      "extendInfo": {
+        "NSCalendarsFullAccessUsageDescription": "下班啦只读取日历日程，用来在本软件内同步提醒。",
+        "NSCalendarsUsageDescription": "下班啦只读取日历日程，用来在本软件内同步提醒。",
+        "NSRemindersFullAccessUsageDescription": "下班啦只读取提醒事项，用来在本软件内同步提醒。",
+        "NSRemindersUsageDescription": "下班啦只读取提醒事项，用来在本软件内同步提醒。"
+      },
+      "extraResources": [
+        {
+          "from": "dist-electron/native/eventkit-bridge",
+          "to": "native/eventkit-bridge"
+        },
+        {
+          "from": "dist-electron/native/status-bar-helper",
+          "to": "native/status-bar-helper"
+        }
+      ],
+      "target": [
+        "dmg",
+        "zip"
+      ]
+    },
+    "win": {
+      "icon": "build/icon.ico",
+      "target": [
+        "nsis",
+        "portable"
+      ]
+    }
+  }
+}

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>CFBundleIdentifier</key>
+  <string>com.xiabanla.app.eventkit-bridge</string>
+  <key>CFBundleName</key>
+  <string>下班啦</string>
+  <key>CFBundleDisplayName</key>
+  <string>下班啦</string>
+  <key>CFBundleExecutable</key>
+  <string>eventkit-bridge</string>
+  <key>CFBundlePackageType</key>
+  <string>APPL</string>
+  <key>NSCalendarsFullAccessUsageDescription</key>
+  <string>下班啦只读取日历日程，用来在本软件内同步提醒。</string>
+  <key>NSCalendarsUsageDescription</key>
+  <string>下班啦只读取日历日程，用来在本软件内同步提醒。</string>
+  <key>NSRemindersFullAccessUsageDescription</key>
+  <string>下班啦只读取提醒事项，用来在本软件内同步提醒。</string>
+  <key>NSRemindersUsageDescription</key>
+  <string>下班啦只读取提醒事项，用来在本软件内同步提醒。</string>
+</dict>
+</plist>
