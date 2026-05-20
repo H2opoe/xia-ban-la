@@ -1,9 +1,10 @@
 import { useEffect, useRef, useState, type Dispatch, type SetStateAction } from 'react';
-import type { DisplayInfo, Reminder, ReminderMessage } from '../../../shared/types';
+import type { AppFeatureFlags, DisplayInfo, Reminder, ReminderMessage } from '../../../shared/types';
 
 type ReminderPersistenceOptions = {
   setDefaultMessageDrafts: Dispatch<SetStateAction<ReminderMessage[]>>;
   setDisplays: Dispatch<SetStateAction<DisplayInfo[]>>;
+  setFeatureFlags: Dispatch<SetStateAction<AppFeatureFlags>>;
   setNotice: (notice: string) => void;
 };
 
@@ -19,14 +20,16 @@ export function useReminderPersistence(options: ReminderPersistenceOptions) {
   }, [reminders]);
 
   async function refresh() {
-    const [nextReminders, nextDisplays, nextDefaultMessages] = await Promise.all([
+    const [nextReminders, nextDisplays, nextDefaultMessages, nextFeatureFlags] = await Promise.all([
       window.xiabanla.getReminders(),
       window.xiabanla.getDisplays(),
-      window.xiabanla.getDefaultMessages()
+      window.xiabanla.getDefaultMessages(),
+      window.xiabanla.getAppFeatureFlags()
     ]);
     setReminders(nextReminders);
     options.setDisplays(nextDisplays);
     options.setDefaultMessageDrafts(nextDefaultMessages);
+    options.setFeatureFlags(nextFeatureFlags);
     options.setNotice('配置已加载');
   }
 

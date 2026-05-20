@@ -29,6 +29,9 @@ type StoreFile = {
   defaultMessages?: ReminderMessage[];
   settings?: Partial<AppSettings>;
   exampleMoreRemindersSeeded?: boolean;
+};
+
+type LegacyStoreFile = StoreFile & {
   exampleRemindersSeeded?: boolean;
 };
 
@@ -184,12 +187,12 @@ export class ReminderStore {
   private async loadFromDisk() {
     try {
       const content = await readFile(this.filePath, 'utf8');
-      const parsed = JSON.parse(content) as Partial<StoreFile>;
+      const parsed = JSON.parse(content) as Partial<LegacyStoreFile>;
       const reminders = Array.isArray(parsed.reminders) ? parsed.reminders : [];
       this.defaultMessages = getStoredDefaultMessages(parsed.defaultMessages, reminders);
       this.settings = normalizeAppSettings(parsed.settings);
       if (reminders.length > 0) {
-        this.exampleMoreRemindersSeeded = Boolean(parsed.exampleMoreRemindersSeeded ?? parsed.exampleRemindersSeeded);
+        this.exampleMoreRemindersSeeded = getExampleMoreRemindersSeeded(parsed);
         return this.ensureExampleMoreReminders(reminders.map((reminder) => this.normalizeReminder(migrateStoredReminder(reminder as Reminder))));
       }
     } catch {
@@ -297,4 +300,9 @@ export class ReminderStore {
 
     return changed;
   }
+}
+
+function getExampleMoreRemindersSeeded(parsed: Partial<LegacyStoreFile>) {
+  // 早期版本写入的是 exampleRemindersSeeded；读取时迁移到当前字段，保存后不再写回旧字段。
+  return Boolean(parsed.exampleMoreRemindersSeeded ?? parsed.exampleRemindersSeeded);
 }

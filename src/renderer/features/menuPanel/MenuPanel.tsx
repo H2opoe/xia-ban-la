@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import type {
+  AppFeatureFlags,
   DisplayInfo,
   MenuFloatingSurfaceKind,
   Reminder,
@@ -35,6 +36,9 @@ import { useReminderTitleDraft } from './useReminderTitleDraft';
 const REMINDER_REORDER_ANIMATION_MS = 220;
 const REMINDER_BLANK_CREATE_MENU_SUPPRESS_MS = 260;
 const SYNCED_REMINDER_CONTEXT_MENU_HEIGHT = 86;
+const DEFAULT_FEATURE_FLAGS: AppFeatureFlags = {
+  externalSources: false
+};
 
 function getReminderKey(reminder: Reminder) {
   return reminder.id;
@@ -45,6 +49,7 @@ export function SettingsApp(props: { foregroundReminderActive?: boolean }) {
   const [displays, setDisplays] = useState<DisplayInfo[]>([]);
   const [expandedId, setExpandedId] = useState<string>('');
   const [expandedMode, setExpandedMode] = useState<ReminderExpansionMode>('quick');
+  const [featureFlags, setFeatureFlags] = useState<AppFeatureFlags>(DEFAULT_FEATURE_FLAGS);
   const [themeMode, setThemeMode] = useState<ThemeMode>(() => loadThemeMode());
   const [now, setNow] = useState(() => new Date());
   const [, setNotice] = useState('正在加载配置...');
@@ -67,6 +72,7 @@ export function SettingsApp(props: { foregroundReminderActive?: boolean }) {
   } = useReminderPersistence({
     setDefaultMessageDrafts,
     setDisplays,
+    setFeatureFlags,
     setNotice
   });
   const [menuPanelExiting, setMenuPanelExiting] = useState(false);
@@ -380,6 +386,10 @@ export function SettingsApp(props: { foregroundReminderActive?: boolean }) {
   }
 
   async function toggleExternalPanel(element: Element) {
+    if (!featureFlags.externalSources) {
+      return;
+    }
+
     if (blockOtherInteractionWhenReminderTitleMissing()) {
       return;
     }
@@ -566,6 +576,7 @@ export function SettingsApp(props: { foregroundReminderActive?: boolean }) {
       offWorkExpanded={offWorkExpanded}
       offWorkReminder={offWorkReminder}
       registerMoreReminderElement={registerMoreReminderElement}
+      showExternalSync={featureFlags.externalSources}
       visibleOffWorkReminder={visibleOffWorkReminder}
       onAddDefaultMessage={addDefaultMessageDraft}
       onAddOffWorkReminder={addOffWorkReminder}

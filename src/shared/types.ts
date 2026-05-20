@@ -1,7 +1,7 @@
 export type RepeatRule = 'once' | 'daily' | 'weekdays' | 'weekly' | 'alternate-weeks';
 export type ThemeMode = 'system' | 'light' | 'dark';
 
-export type ExternalProvider = 'macos-calendar' | 'macos-reminders' | 'windows-calendar';
+export type ExternalProvider = 'macos-calendar' | 'macos-reminders';
 
 export type ReminderMessage = {
   id: string;
@@ -110,6 +110,10 @@ export type AppAboutInfo = {
   currentYear: number;
 };
 
+export type AppFeatureFlags = {
+  externalSources: boolean;
+};
+
 export type ReminderPayload = {
   reminderId: string;
   title: string;
@@ -178,6 +182,7 @@ export type ReminderApi = {
   getAppSettings(): Promise<AppSettings>;
   setLockScreenAfterIdle(enabled: boolean): Promise<AppSettings>;
   setSelectedDisplayIds(displayIds: string[]): Promise<AppSettings>;
+  getAppFeatureFlags(): Promise<AppFeatureFlags>;
   getAppAboutInfo(): Promise<AppAboutInfo>;
   openExternalLink(url: string): Promise<void>;
   hideMenuPanel(): Promise<void>;

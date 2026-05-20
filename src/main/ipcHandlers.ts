@@ -10,7 +10,8 @@ import type {
   SyncResult
 } from '../shared/types.js';
 import { getDisplayInfos } from './displays.js';
-import { listExternalEvents } from './externalSources.js';
+import { isExternalSourcesSupported, listExternalEvents } from './externalSources.js';
+import type { ReminderActionSession } from './reminderActionSession.js';
 import type { ReminderScheduler } from './scheduler.js';
 import type { ReminderStore } from './store.js';
 
@@ -30,7 +31,7 @@ type RegisterIpcHandlersDeps = {
   scheduler: ReminderScheduler;
   draftReminders: Map<string, Reminder>;
   reminderPayloads: Map<number, ReminderPayload>;
-  previewReminderSourceIds: Map<string, string>;
+  reminderActionSession: ReminderActionSession;
   getMenuPanelWindow: () => BrowserWindow | null;
   selectDisplays: () => DisplayInfo[];
   showReminderWindows: (reminder: Reminder, options?: ReminderWindowOptions) => Promise<void>;
@@ -56,7 +57,7 @@ export function registerIpcHandlers(deps: RegisterIpcHandlersDeps) {
     scheduler,
     draftReminders,
     reminderPayloads,
-    previewReminderSourceIds,
+    reminderActionSession,
     getMenuPanelWindow,
     selectDisplays,
     showReminderWindows,
@@ -75,18 +76,6 @@ export function registerIpcHandlers(deps: RegisterIpcHandlersDeps) {
     updateOpenReminderPayloads,
     sendWindowMessage
   } = deps;
-
-  function consumeReminderActionId(reminderId: string) {
-    const actionReminderId = previewReminderSourceIds.get(reminderId) || reminderId;
-    previewReminderSourceIds.delete(reminderId);
-    return actionReminderId;
-  }
-
-  function consumePreviewReminderId(reminderId: string) {
-    const isPreviewReminder = previewReminderSourceIds.has(reminderId) || reminderId.endsWith(':preview');
-    previewReminderSourceIds.delete(reminderId);
-    return isPreviewReminder;
-  }
 
   function setReminderOverlayMouseThrough(sender: Electron.WebContents, enabled: boolean) {
     if (!reminderPayloads.has(sender.id)) {
@@ -164,7 +153,7 @@ export function registerIpcHandlers(deps: RegisterIpcHandlersDeps) {
       message: REMINDER_PREVIEW_TEXT
     });
 
-    previewReminderSourceIds.set(previewReminder.id, reminder.id);
+    reminderActionSession.registerPreview(previewReminder.id, reminder.id);
     await showReminderWindows(previewReminder, { displays, payload });
     return {
       payload,
@@ -173,28 +162,34 @@ export function registerIpcHandlers(deps: RegisterIpcHandlersDeps) {
   });
   ipcMain.handle('reminders:snooze', async (_event, id: string, minutes: number) => {
     dismissReminderWindows(id);
-    if (consumePreviewReminderId(id)) {
+    if (reminderActionSession.consumePreview(id)) {
       return;
     }
-    await scheduler.snooze(consumeReminderActionId(id), minutes);
+    await scheduler.snooze(reminderActionSession.consumeActionId(id), minutes);
   });
   ipcMain.handle('reminders:dismiss', async (_event, id: string) => {
     await dismissReminderById(id);
   });
   ipcMain.handle('reminders:enter', async (_event, id: string) => {
     dismissReminderWindows(id);
-    if (consumePreviewReminderId(id)) {
+    if (reminderActionSession.consumePreview(id)) {
       showMenuPanel();
       return;
     }
-    await store.markCompletedOnDismiss(consumeReminderActionId(id));
+    await store.markCompletedOnDismiss(reminderActionSession.consumeActionId(id));
     showMenuPanel();
   });
   ipcMain.handle('external:list', () => listExternalEvents());
   ipcMain.handle('external:link', async (_event, reminderId: string, eventId: string) => {
+    if (!isExternalSourcesSupported()) {
+      throw new Error('当前系统暂不支持读取本机日程和提醒事项');
+    }
     await linkExternalEvent(reminderId, eventId);
   });
   ipcMain.handle('external:sync', () => syncExternalSourcesHandler());
+  ipcMain.handle('app:feature-flags:get', () => ({
+    externalSources: isExternalSourcesSupported()
+  }));
   ipcMain.handle('settings:default-messages:get', () => store.getDefaultMessages());
   ipcMain.handle('settings:default-messages:save', async (_event, messages) => {
     const savedMessages = await store.saveDefaultMessages(messages);
@@ -240,7 +235,9 @@ export function registerIpcHandlers(deps: RegisterIpcHandlersDeps) {
     keepMenuPanelOpenForInternalInteraction();
   });
   ipcMain.handle('menu-floating:open', (event, request: MenuFloatingSurfaceRequest) => (
-    openMenuFloatingSurface(event.sender, request)
+    request.kind === 'external-sync' && !isExternalSourcesSupported()
+      ? undefined
+      : openMenuFloatingSurface(event.sender, request)
   ));
   ipcMain.handle('menu-floating:close', (_event, kind?: MenuFloatingSurfaceKind) => {
     closeMenuFloatingWindows(kind);

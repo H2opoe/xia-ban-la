@@ -24,13 +24,11 @@ const MAC_EVENTKIT_HELPER_NAME = 'eventkit-bridge';
 const MAC_EVENTKIT_HELPER_TIMEOUT_MS = 60_000;
 
 export async function listExternalEvents(): Promise<ExternalEventListResult> {
-  if (process.platform === 'darwin') {
+  if (isExternalSourcesSupported()) {
     return listMacEvents();
   }
 
-  const message = process.platform === 'win32'
-    ? '当前 Windows 系统日历接口暂不可用，本地提醒仍可正常使用'
-    : '当前系统暂不支持读取本机日程和提醒事项';
+  const message = '当前系统暂不支持读取本机日程和提醒事项';
 
   return {
     events: [],
@@ -40,6 +38,10 @@ export async function listExternalEvents(): Promise<ExternalEventListResult> {
     ],
     message
   };
+}
+
+export function isExternalSourcesSupported() {
+  return process.platform === 'darwin';
 }
 
 export async function syncExternalSources(reminders: Reminder[]): Promise<{ reminders: Reminder[]; result: SyncResult }> {
@@ -293,7 +295,7 @@ function isExternalSourceAccess(access: unknown): access is ExternalSourceAccess
 }
 
 function isExternalProvider(provider: unknown): provider is ExternalProvider {
-  return provider === 'macos-calendar' || provider === 'macos-reminders' || provider === 'windows-calendar';
+  return provider === 'macos-calendar' || provider === 'macos-reminders';
 }
 
 function getListMessage(events: ExternalEvent[], accessList: ExternalSourceAccess[]) {
@@ -318,7 +320,7 @@ function getAccessKindForProvider(provider: ExternalProvider): ExternalAccessKin
 }
 
 function isCalendarProvider(provider: ExternalProvider) {
-  return provider === 'macos-calendar' || provider === 'windows-calendar';
+  return provider === 'macos-calendar';
 }
 
 function hasExternalOccurrenceChanged(reminder: Reminder, externalPatch: ReturnType<typeof createExternalReminderPatch>) {

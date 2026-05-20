@@ -21,7 +21,7 @@ export function FloatingExternalSyncMenu() {
   const [externalAccess, setExternalAccess] = useState<ExternalSourceAccess[]>([]);
   const [externalEventsLoading, setExternalEventsLoading] = useState(true);
   const [externalPanelTab, setExternalPanelTab] = useState<ExternalPanelTab>('calendar');
-  const calendarExternalEvents = externalEvents.filter((event) => event.provider === 'macos-calendar' || event.provider === 'windows-calendar');
+  const calendarExternalEvents = externalEvents.filter((event) => event.provider === 'macos-calendar');
   const reminderExternalEvents = externalEvents.filter(shouldShowExternalReminderInList);
   const activeExternalEvents = externalPanelTab === 'calendar' ? calendarExternalEvents : reminderExternalEvents;
   const activeExternalEmptyText = getExternalEmptyText(externalPanelTab, externalAccess);

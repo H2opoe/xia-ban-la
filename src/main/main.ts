@@ -5,10 +5,12 @@ import { fileURLToPath } from 'node:url';
 import type { Reminder, ReminderPayload } from '../shared/types.js';
 import { registerApplicationMenu } from './applicationMenu.js';
 import { ExternalSyncService } from './externalSyncService.js';
+import { isExternalSourcesSupported } from './externalSources.js';
 import { registerIpcHandlers } from './ipcHandlers.js';
 import { MenuPanelController } from './menuPanelController.js';
 import { MenuFloatingController } from './menuFloatingController.js';
 import { loadRenderer as loadRendererForWindow } from './rendererLoader.js';
+import { ReminderActionSession } from './reminderActionSession.js';
 import { ReminderOverlayController } from './reminderOverlayController.js';
 import { ReminderScheduler } from './scheduler.js';
 import { StatusBarEntry } from './statusBarEntry.js';
@@ -21,7 +23,7 @@ const store = new ReminderStore();
 let scheduler: ReminderScheduler;
 let externalSyncService: ExternalSyncService | null = null;
 const reminderPayloads = new Map<number, ReminderPayload>();
-const previewReminderSourceIds = new Map<string, string>();
+const reminderActionSession = new ReminderActionSession();
 const draftReminders = new Map<string, Reminder>();
 let isQuittingApp = false;
 
@@ -33,7 +35,7 @@ const reminderOverlays = new ReminderOverlayController({
   dirname: __dirname,
   store,
   reminderPayloads,
-  previewReminderSourceIds,
+  reminderActionSession,
   getMenuPanelWindow: () => menuPanel.getWindow(),
   loadRenderer,
   sendWindowMessage
@@ -79,7 +81,9 @@ if (process.platform === 'darwin') {
 
 void app.whenReady().then(async () => {
   await store.init();
-  externalSyncService = new ExternalSyncService(store);
+  if (isExternalSourcesSupported()) {
+    externalSyncService = new ExternalSyncService(store);
+  }
   scheduler = new ReminderScheduler(
     store,
     (reminder, options) => reminderOverlays.showWindows(reminder, options),
@@ -90,7 +94,7 @@ void app.whenReady().then(async () => {
     scheduler,
     draftReminders,
     reminderPayloads,
-    previewReminderSourceIds,
+    reminderActionSession,
     getMenuPanelWindow: () => menuPanel.getWindow(),
     selectDisplays: () => reminderOverlays.selectDisplays(),
     showReminderWindows: (reminder, options) => reminderOverlays.showWindows(reminder, options),
@@ -103,9 +107,9 @@ void app.whenReady().then(async () => {
     closeMenuFloatingWindows: (kind) => menuFloating.closeWindows(kind),
     requestAppQuit,
     syncExternalSourcesNow: () => externalSyncService?.syncNow() ?? Promise.resolve({
-      ok: true,
+      ok: false,
       syncedCount: 0,
-      message: '没有需要同步的外部提醒'
+      message: '当前系统暂不支持读取本机日程和提醒事项'
     }),
     broadcastDefaultMessagesUpdated,
     broadcastDraftReminderUpdated,
@@ -119,7 +123,7 @@ void app.whenReady().then(async () => {
   registerPowerRecoveryHandlers();
   statusBarEntry.applyRuntimeIcons();
   scheduler.start();
-  externalSyncService.start();
+  externalSyncService?.start();
 
   screen.on('display-added', () => broadcastReminders());
   screen.on('display-removed', () => broadcastReminders());

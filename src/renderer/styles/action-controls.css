@@ -175,6 +175,10 @@
   border-top: 0;
 }
 
+.menu-footer-primary-only {
+  justify-content: flex-end;
+}
+
 .icon-button {
   display: inline-grid;
   place-items: center;

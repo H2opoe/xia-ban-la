@@ -39,6 +39,7 @@ type MenuPanelViewProps = {
   offWorkExpanded: boolean;
   offWorkReminder?: Reminder;
   registerMoreReminderElement: (key: string, element: HTMLElement | null) => void;
+  showExternalSync: boolean;
   visibleOffWorkReminder: Reminder | null;
   onAddDefaultMessage: () => void;
   onAddOffWorkReminder: () => void;
@@ -157,20 +158,22 @@ export function MenuPanelView(props: MenuPanelViewProps) {
           </button>
         </div>
 
-        <footer className="menu-footer">
-          <div className="external-sync-anchor">
-            <button
-              className={props.activeFloatingSurface === 'external-sync' ? 'icon-button footer-icon-button floating-surface-toggle selected' : 'icon-button footer-icon-button floating-surface-toggle'}
-              type="button"
-              onClick={(event) => props.onToggleExternalPanel(event.currentTarget)}
-              aria-controls="external-sync-panel"
-              aria-expanded={props.activeFloatingSurface === 'external-sync'}
-              aria-label="打开或关闭同步二级菜单"
-              title="打开或关闭同步二级菜单"
-            >
-              <LinkIcon />
-            </button>
-          </div>
+        <footer className={props.showExternalSync ? 'menu-footer' : 'menu-footer menu-footer-primary-only'}>
+          {props.showExternalSync && (
+            <div className="external-sync-anchor">
+              <button
+                className={props.activeFloatingSurface === 'external-sync' ? 'icon-button footer-icon-button floating-surface-toggle selected' : 'icon-button footer-icon-button floating-surface-toggle'}
+                type="button"
+                onClick={(event) => props.onToggleExternalPanel(event.currentTarget)}
+                aria-controls="external-sync-panel"
+                aria-expanded={props.activeFloatingSurface === 'external-sync'}
+                aria-label="打开或关闭同步二级菜单"
+                title="打开或关闭同步二级菜单"
+              >
+                <LinkIcon />
+              </button>
+            </div>
+          )}
           <button
             className={props.newReminderButtonClassName}
             data-reminder-draft-action

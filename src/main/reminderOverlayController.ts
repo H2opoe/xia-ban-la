@@ -5,6 +5,7 @@ import { createReminderPayload } from '../shared/reminderPayload.js';
 import type { DisplayInfo, Reminder, ReminderPayload } from '../shared/types.js';
 import { getDisplayInfos } from './displays.js';
 import { createAppIcon } from './icons.js';
+import type { ReminderActionSession } from './reminderActionSession.js';
 import type { ReminderStore } from './store.js';
 
 const REMINDER_ESCAPE_SHORTCUT = 'Escape';
@@ -28,7 +29,7 @@ type ReminderOverlayControllerOptions = {
   dirname: string;
   store: ReminderStore;
   reminderPayloads: Map<number, ReminderPayload>;
-  previewReminderSourceIds: Map<string, string>;
+  reminderActionSession: ReminderActionSession;
   getMenuPanelWindow: () => BrowserWindow | null;
   loadRenderer: (windowItem: BrowserWindow, route?: string) => Promise<void>;
   sendWindowMessage: (windowItem: BrowserWindow, channel: string, ...args: unknown[]) => boolean;
@@ -153,10 +154,10 @@ export class ReminderOverlayController {
 
   async dismissById(reminderId: string) {
     this.dismissWindows(reminderId);
-    if (this.consumePreviewReminderId(reminderId)) {
+    if (this.options.reminderActionSession.consumePreview(reminderId)) {
       return;
     }
-    await this.options.store.markCompletedOnDismiss(this.consumeReminderActionId(reminderId));
+    await this.options.store.markCompletedOnDismiss(this.options.reminderActionSession.consumeActionId(reminderId));
   }
 
   updateOpenPayloads(reminders: Reminder[]) {
@@ -217,7 +218,7 @@ export class ReminderOverlayController {
     this.options.reminderPayloads.clear();
     this.activeReminderSessions.clear();
     this.stopWindowReassertTimer();
-    this.options.previewReminderSourceIds.clear();
+    this.options.reminderActionSession.clear();
     this.updateEscapeShortcut();
   }
 
@@ -388,18 +389,6 @@ export class ReminderOverlayController {
       clearInterval(timer);
     }
     this.reminderRepeatTimers.clear();
-  }
-
-  private consumeReminderActionId(reminderId: string) {
-    const actionReminderId = this.options.previewReminderSourceIds.get(reminderId) || reminderId;
-    this.options.previewReminderSourceIds.delete(reminderId);
-    return actionReminderId;
-  }
-
-  private consumePreviewReminderId(reminderId: string) {
-    const isPreviewReminder = this.options.previewReminderSourceIds.has(reminderId) || reminderId.endsWith(':preview');
-    this.options.previewReminderSourceIds.delete(reminderId);
-    return isPreviewReminder;
   }
 
   private async sleepDisplays() {
