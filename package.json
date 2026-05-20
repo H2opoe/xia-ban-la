@@ -16,7 +16,7 @@
     "build:renderer": "vite build",
     "typecheck": "tsc --noEmit && tsc -p tsconfig.electron.json --noEmit",
     "package": "npm run package:mac",
-    "package:mac": "npm run build && electron-builder --mac dmg --universal"
+    "package:mac": "npm run build && electron-builder --mac"
   },
   "devDependencies": {
     "@types/node": "^22.15.21",
@@ -79,7 +79,12 @@
         }
       ],
       "target": [
-        "dmg"
+        {
+          "target": "dmg",
+          "arch": [
+            "universal"
+          ]
+        }
       ]
     },
     "win": {
