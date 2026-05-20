@@ -5,7 +5,8 @@ import { createDefaultMessages, createId } from './defaults.js';
 
 export const DEFAULT_APP_SETTINGS: AppSettings = {
   lockScreenAfterIdle: false,
-  selectedDisplayIds: []
+  selectedDisplayIds: [],
+  themeMode: 'system'
 };
 
 export function getStoredDefaultMessages(messages: ReminderMessage[] | undefined, reminders: unknown[]) {
@@ -25,8 +26,15 @@ export function normalizeAppSettings(settings: Partial<AppSettings> | undefined)
   return {
     ...DEFAULT_APP_SETTINGS,
     lockScreenAfterIdle: settings?.lockScreenAfterIdle === true,
-    selectedDisplayIds: Array.isArray(settings?.selectedDisplayIds) ? settings.selectedDisplayIds : []
+    selectedDisplayIds: Array.isArray(settings?.selectedDisplayIds) ? settings.selectedDisplayIds : [],
+    themeMode: normalizeThemeMode(settings?.themeMode)
   };
+}
+
+function normalizeThemeMode(themeMode: unknown) {
+  return themeMode === 'light' || themeMode === 'dark' || themeMode === 'system'
+    ? themeMode
+    : DEFAULT_APP_SETTINGS.themeMode;
 }
 
 export function normalizeMessages(messages: ReminderMessage[]) {

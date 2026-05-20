@@ -117,13 +117,16 @@ void app.whenReady().then(async () => {
     updateOpenReminderPayloads: (reminders) => reminderOverlays.updateOpenPayloads(reminders),
     sendWindowMessage
   });
+  scheduler.start();
+  externalSyncService?.start();
+  registerPowerRecoveryHandlers();
+
+  await menuPanel.prepare();
   statusBarEntry.register();
   registerApplicationMenu(() => menuPanel.show());
   statusBarEntry.registerThemeIconUpdates();
-  registerPowerRecoveryHandlers();
   statusBarEntry.applyRuntimeIcons();
-  scheduler.start();
-  externalSyncService?.start();
+  menuPanel.show();
 
   screen.on('display-added', () => broadcastReminders());
   screen.on('display-removed', () => broadcastReminders());

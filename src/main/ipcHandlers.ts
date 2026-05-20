@@ -7,7 +7,8 @@ import type {
   MenuFloatingSurfaceRequest,
   Reminder,
   ReminderPayload,
-  SyncResult
+  SyncResult,
+  ThemeMode
 } from '../shared/types.js';
 import { getDisplayInfos } from './displays.js';
 import { isExternalSourcesSupported, listExternalEvents } from './externalSources.js';
@@ -214,6 +215,11 @@ export function registerIpcHandlers(deps: RegisterIpcHandlersDeps) {
   });
   ipcMain.handle('settings:selected-display-ids:set', async (_event, displayIds: string[]) => {
     const settings = await store.setSelectedDisplayIds(displayIds);
+    broadcastAppSettingsUpdated();
+    return settings;
+  });
+  ipcMain.handle('settings:theme-mode:set', async (_event, themeMode: ThemeMode) => {
+    const settings = await store.setThemeMode(themeMode);
     broadcastAppSettingsUpdated();
     return settings;
   });

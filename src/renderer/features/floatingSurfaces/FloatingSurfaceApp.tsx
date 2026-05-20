@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import type { MenuFloatingSurfaceKind, ThemeMode } from '../../../shared/types';
-import { loadThemeMode, subscribeThemeMode } from '../../state/theme';
+import { initializeThemeMode, loadThemeMode, subscribeThemeMode } from '../../state/theme';
 import { FloatingExternalSyncMenu } from './ExternalSyncSurface';
 import {
   FloatingSettingsAboutMenu,
@@ -45,6 +45,7 @@ export function FloatingSurfaceApp(props: { route: FloatingRoute }) {
   }, []);
 
   useEffect(() => {
+    void initializeThemeMode().then(setThemeMode);
     return subscribeThemeMode(setThemeMode);
   }, []);
 

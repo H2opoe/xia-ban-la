@@ -26,6 +26,7 @@ const api: ReminderApi = {
   getAppSettings: () => ipcRenderer.invoke('settings:app:get'),
   setLockScreenAfterIdle: (enabled) => ipcRenderer.invoke('settings:lock-screen-after-idle:set', enabled),
   setSelectedDisplayIds: (displayIds) => ipcRenderer.invoke('settings:selected-display-ids:set', displayIds),
+  setThemeMode: (themeMode) => ipcRenderer.invoke('settings:theme-mode:set', themeMode),
   getAppFeatureFlags: () => ipcRenderer.invoke('app:feature-flags:get'),
   getAppAboutInfo: () => ipcRenderer.invoke('app:about-info'),
   openExternalLink: (url) => ipcRenderer.invoke('app:open-external-link', url),

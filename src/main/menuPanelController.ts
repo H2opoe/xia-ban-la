@@ -36,9 +36,12 @@ export class MenuPanelController {
   private window: BrowserWindow | null = null;
   private hideTimer: NodeJS.Timeout | null = null;
   private blurTimer: NodeJS.Timeout | null = null;
+  private loadPromise: Promise<void> | null = null;
+  private isRendererLoaded = false;
   private hideRequestInFlight = false;
   private keepOpenUntil = 0;
   private shouldOpenSettings = false;
+  private shouldShowWhenLoaded = false;
 
   constructor(private readonly options: MenuPanelControllerOptions) {}
 
@@ -59,16 +62,36 @@ export class MenuPanelController {
     this.show();
   }
 
+  prepare() {
+    if (this.options.isQuitting()) {
+      return Promise.resolve();
+    }
+
+    return this.ensureWindow();
+  }
+
   show() {
     if (this.options.isQuitting()) {
       return;
     }
 
-    if (this.window && !this.window.isDestroyed()) {
+    const windowItem = this.ensureWindow();
+    if (this.window && !this.window.isDestroyed() && this.isRendererLoaded) {
       this.showWindow(this.window);
       return;
     }
 
+    this.shouldShowWhenLoaded = true;
+    void windowItem;
+  }
+
+  private ensureWindow() {
+    if (this.window && !this.window.isDestroyed()) {
+      return this.loadPromise ?? Promise.resolve();
+    }
+
+    this.isRendererLoaded = false;
+    this.shouldShowWhenLoaded = false;
     this.window = new BrowserWindow({
       width: MENU_PANEL_WINDOW_SIZE.width,
       height: MENU_PANEL_WINDOW_SIZE.height,
@@ -99,12 +122,6 @@ export class MenuPanelController {
       }
     });
 
-    this.window.once('ready-to-show', () => {
-      if (this.window && !this.window.isDestroyed()) {
-        this.showWindow(this.window);
-      }
-    });
-
     this.window.on('blur', () => {
       // 菜单栏弹窗应像系统弹出面板一样，用户点到别处后自动收起。
       if (this.window && !this.window.isDestroyed()) {
@@ -115,15 +132,17 @@ export class MenuPanelController {
       }
     });
     const pendingWindow = this.window;
-    void this.options.loadRenderer(pendingWindow)
+    this.loadPromise = this.options.loadRenderer(pendingWindow)
       .then(() => {
-        // 透明无边框窗口在预览态偶尔不会触发 ready-to-show，需要在内容加载完成后再兜底显示。
+        // 菜单栏入口只在主面板完成首屏加载后创建，避免入口出现但首次点击仍无响应。
         if (
           pendingWindow === this.window
           && !pendingWindow.isDestroyed()
-          && !pendingWindow.isVisible()
         ) {
-          this.showWindow(pendingWindow);
+          this.isRendererLoaded = true;
+          if (this.shouldShowWhenLoaded) {
+            this.showWindow(pendingWindow);
+          }
         }
       })
       .catch((error: unknown) => {
@@ -134,7 +153,12 @@ export class MenuPanelController {
       this.clearHideTimer();
       this.options.closeFloatingWindows();
       this.window = null;
+      this.loadPromise = null;
+      this.isRendererLoaded = false;
+      this.shouldShowWhenLoaded = false;
     });
+
+    return this.loadPromise;
   }
 
   showWithSettings() {

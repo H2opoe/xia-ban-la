@@ -48,6 +48,7 @@ export type Reminder = {
 export type AppSettings = {
   lockScreenAfterIdle: boolean;
   selectedDisplayIds: string[];
+  themeMode: ThemeMode;
 };
 
 export type DisplayInfo = {
@@ -183,6 +184,7 @@ export type ReminderApi = {
   getAppSettings(): Promise<AppSettings>;
   setLockScreenAfterIdle(enabled: boolean): Promise<AppSettings>;
   setSelectedDisplayIds(displayIds: string[]): Promise<AppSettings>;
+  setThemeMode(themeMode: ThemeMode): Promise<AppSettings>;
   getAppFeatureFlags(): Promise<AppFeatureFlags>;
   getAppAboutInfo(): Promise<AppAboutInfo>;
   openExternalLink(url: string): Promise<void>;

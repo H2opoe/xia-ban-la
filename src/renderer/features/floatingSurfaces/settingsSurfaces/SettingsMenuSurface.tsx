@@ -6,7 +6,7 @@ import type {
 } from '../../../../shared/types';
 import { formatSelectedDisplays } from '../../../domain/displaySelection';
 import { getSettingsAboutMenuWidth } from '../../../domain/settingsMenuMetrics';
-import { loadThemeMode, subscribeThemeMode } from '../../../state/theme';
+import { initializeThemeMode, subscribeThemeMode } from '../../../state/theme';
 import {
   clearHoveredFloatingMenuRow,
   closeFloatingSubmenusFromParentPointer,
@@ -179,7 +179,8 @@ export function FloatingSettingsMenu() {
       setState((current) => (current ? {
         ...current,
         lockScreenAfterIdle: settings.lockScreenAfterIdle,
-        selectedDisplayIds: settings.selectedDisplayIds
+        selectedDisplayIds: settings.selectedDisplayIds,
+        themeMode: settings.themeMode
       } : current));
     });
     const unsubscribeThemeMode = subscribeThemeMode((themeMode) => {
@@ -201,10 +202,11 @@ export function FloatingSettingsMenu() {
         autoLaunch,
         lockScreenAfterIdle: appSettings.lockScreenAfterIdle,
         selectedDisplayIds: appSettings.selectedDisplayIds,
-        themeMode: loadThemeMode(),
+        themeMode: appSettings.themeMode,
         displays,
         aboutInfo
       });
+      void initializeThemeMode();
     }
   }, []);
 

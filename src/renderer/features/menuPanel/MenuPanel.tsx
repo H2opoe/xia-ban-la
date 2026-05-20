@@ -10,7 +10,7 @@ import {
   useAnimatedList,
   useListReorderMotion
 } from '../../hooks/useMotion';
-import { loadThemeMode, subscribeThemeMode } from '../../state/theme';
+import { initializeThemeMode, loadThemeMode, subscribeThemeMode } from '../../state/theme';
 import { toDateKey } from '../../domain/dateTimeInput';
 import {
   getHoveredReminderIdFromTarget
@@ -183,6 +183,7 @@ export function SettingsApp(props: { foregroundReminderActive?: boolean }) {
   const foregroundReminderActive = foregroundReminderActiveProp || nativeReminderOverlayVisible;
 
   useEffect(() => {
+    void initializeThemeMode().then(setThemeMode);
     return subscribeThemeMode(setThemeMode);
   }, []);
 

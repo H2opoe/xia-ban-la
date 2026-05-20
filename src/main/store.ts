@@ -7,7 +7,7 @@ import {
   toDateKey
 } from '../shared/reminderSchedule.js';
 import { OFF_WORK_REMINDER_ID } from '../shared/reminderConstants.js';
-import type { AppSettings, Reminder, ReminderMessage } from '../shared/types.js';
+import type { AppSettings, Reminder, ReminderMessage, ThemeMode } from '../shared/types.js';
 import { createDefaultExampleMoreReminders, createDefaultMessages } from './defaults.js';
 import {
   clearCompletedState,
@@ -179,6 +179,15 @@ export class ReminderStore {
     this.settings = {
       ...this.settings,
       selectedDisplayIds: this.normalizeSelectedDisplayIds(displayIds)
+    };
+    await this.saveToDisk();
+    return this.getAppSettings();
+  }
+
+  async setThemeMode(themeMode: ThemeMode) {
+    this.settings = {
+      ...this.settings,
+      themeMode
     };
     await this.saveToDisk();
     return this.getAppSettings();

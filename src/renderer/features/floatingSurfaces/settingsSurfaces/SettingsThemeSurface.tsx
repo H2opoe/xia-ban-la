@@ -1,16 +1,19 @@
 import { useEffect, useState } from 'react';
 import type { ThemeMode } from '../../../../shared/types';
-import { loadThemeMode, saveThemeMode, subscribeThemeMode } from '../../../state/theme';
+import { initializeThemeMode, loadThemeMode, saveThemeMode, subscribeThemeMode } from '../../../state/theme';
 import { FloatingMenuSurface } from '../floatingSurfaceModel';
 
 export function FloatingSettingsThemeMenu() {
   const [themeMode, setThemeMode] = useState<ThemeMode>(() => loadThemeMode());
 
-  useEffect(() => subscribeThemeMode(setThemeMode), []);
+  useEffect(() => {
+    void initializeThemeMode().then(setThemeMode);
+    return subscribeThemeMode(setThemeMode);
+  }, []);
 
   function updateTheme(nextThemeMode: ThemeMode) {
     setThemeMode(nextThemeMode);
-    saveThemeMode(nextThemeMode);
+    void saveThemeMode(nextThemeMode).then(setThemeMode);
   }
 
   return (

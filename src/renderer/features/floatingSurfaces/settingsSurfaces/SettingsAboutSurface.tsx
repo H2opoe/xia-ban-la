@@ -28,6 +28,7 @@ export function FloatingSettingsAboutMenu() {
       </div>
       <div className="settings-about-row">Version {aboutInfo.version}</div>
       <div className="settings-about-row">Copyright © {aboutInfo.currentYear} 佛山市戴胜文化传媒有限公司</div>
+      <div className="settings-about-divider" aria-hidden="true" />
       <div className="settings-about-community">
         <p>添加作者入群，接收更新或反馈。</p>
         <button className="settings-about-qr-button" type="button" onClick={() => void window.xiabanla.openExternalLink(WECHAT_GROUP_URL)}>
