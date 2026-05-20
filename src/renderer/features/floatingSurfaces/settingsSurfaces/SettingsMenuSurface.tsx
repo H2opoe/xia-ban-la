@@ -88,6 +88,10 @@ function SettingsPopover(props: {
     openSettingsSubmenu('settings-about', event, { placement: 'left-top' });
   }
 
+  function openDonationSubmenu(event: React.SyntheticEvent<HTMLElement>) {
+    openSettingsSubmenu('donation', event, { placement: 'left-top' });
+  }
+
   return (
     <section
       className={['floating-menu-surface', 'is-open', className].filter(Boolean).join(' ')}
@@ -145,6 +149,17 @@ function SettingsPopover(props: {
       >
         <button className="floating-menu-row floating-menu-parent settings-menu-row" type="button" onClick={openAboutSubmenu}>
           <span>关于软件</span>
+          <span className="settings-menu-arrow" aria-hidden="true">›</span>
+        </button>
+      </div>
+      <div
+        className={['floating-menu-group settings-menu-group', activeNestedKind === 'donation' ? 'submenu-open' : ''].filter(Boolean).join(' ')}
+        onPointerEnter={openDonationSubmenu}
+        onMouseMove={openDonationSubmenu}
+        onFocus={openDonationSubmenu}
+      >
+        <button className="floating-menu-row floating-menu-parent settings-menu-row" type="button" onClick={openDonationSubmenu}>
+          <span>打赏作者</span>
           <span className="settings-menu-arrow" aria-hidden="true">›</span>
         </button>
       </div>

@@ -174,6 +174,116 @@
   padding: 9px 10px;
 }
 
+.donation-popover {
+  gap: 10px;
+  box-sizing: border-box;
+  width: 100%;
+  padding: 10px;
+  transform-origin: left bottom;
+}
+
+.donation-copy {
+  display: grid;
+  gap: 5px;
+}
+
+.donation-copy strong {
+  font-size: var(--font-secondary-title);
+  line-height: 1.3;
+}
+
+.donation-copy p {
+  margin: 0;
+  color: var(--muted);
+  font-size: var(--font-caption);
+  line-height: 1.55;
+}
+
+.donation-qr-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.donation-qr-card {
+  display: grid;
+  gap: 7px;
+  min-width: 0;
+  padding: 8px;
+  border: 1px solid var(--hairline);
+  border-radius: var(--row-radius);
+  background: var(--control);
+}
+
+.donation-qr-visual {
+  position: relative;
+  display: grid;
+}
+
+.donation-qr-visual > img:not(.donation-qr-logo) {
+  display: block;
+  width: 100%;
+  aspect-ratio: 1;
+  border-radius: 6px;
+  background: #fff;
+}
+
+.donation-qr-visual > .donation-qr-logo {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 25%;
+  height: 25%;
+  box-shadow: 0 0 0 3px #fff;
+  object-fit: cover;
+  transform: translate(-50%, -50%);
+}
+
+.donation-qr-logo-wechat {
+  border-radius: 999px;
+  background: #fff;
+}
+
+.donation-qr-logo-alipay {
+  border-radius: 9px;
+  background: #1677ff;
+}
+
+.donation-qr-meta {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+  text-align: center;
+}
+
+.donation-qr-card strong,
+.donation-qr-card span {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.donation-qr-card strong {
+  color: var(--text);
+  font-size: var(--font-body);
+  line-height: 1.25;
+}
+
+.donation-qr-card span {
+  color: var(--muted);
+  font-size: var(--font-caption);
+  line-height: 1.25;
+}
+
+.wechat-donation {
+  border-color: color-mix(in srgb, #07c160 34%, var(--hairline));
+}
+
+.alipay-donation {
+  border-color: color-mix(in srgb, #1677ff 34%, var(--hairline));
+}
+
 .settings-lock-submenu {
   gap: 7px;
   padding: 8px;

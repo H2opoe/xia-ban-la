@@ -132,6 +132,7 @@ export type MenuFloatingSurfaceKind =
   | 'settings-lock-screen'
   | 'settings-theme'
   | 'settings-about'
+  | 'donation'
   | 'external-sync'
   | 'reminder-context'
   | 'title-warning'

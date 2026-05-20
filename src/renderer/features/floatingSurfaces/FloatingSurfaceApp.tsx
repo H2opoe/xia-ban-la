@@ -17,6 +17,7 @@ import {
   FloatingTodayOverrideMenu
 } from './ReminderSurfaces';
 import { FloatingDefaultMessagesMenu } from './DefaultMessagesSurface';
+import { FloatingDonationMenu } from './DonationSurface';
 
 type FloatingRoute = {
   kind: MenuFloatingSurfaceKind;
@@ -54,6 +55,7 @@ export function FloatingSurfaceApp(props: { route: FloatingRoute }) {
       {route.kind === 'settings-lock-screen' && <FloatingSettingsLockScreenMenu />}
       {route.kind === 'settings-theme' && <FloatingSettingsThemeMenu />}
       {route.kind === 'settings-about' && <FloatingSettingsAboutMenu />}
+      {route.kind === 'donation' && <FloatingDonationMenu />}
       {route.kind === 'external-sync' && <FloatingExternalSyncMenu />}
       {route.kind === 'reminder-context' && route.reminderId && <FloatingReminderContextMenu reminderId={route.reminderId} />}
       {route.kind === 'title-warning' && route.reminderId && (

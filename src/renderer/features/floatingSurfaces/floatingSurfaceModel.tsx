@@ -8,6 +8,7 @@ const FLOATING_SUBMENU_KINDS: MenuFloatingSurfaceKind[] = [
   'settings-lock-screen',
   'settings-theme',
   'settings-about',
+  'donation',
   'reminder-date',
   'reminder-repeat',
   'today-override',
