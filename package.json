@@ -62,6 +62,8 @@
     "mac": {
       "category": "public.app-category.productivity",
       "icon": "build/icon.icns",
+      "entitlements": "native/entitlements.mac.plist",
+      "entitlementsInherit": "native/entitlements.mac.plist",
       "extendInfo": {
         "NSCalendarsFullAccessUsageDescription": "下班啦只读取日历日程，用来在本软件内同步提醒。",
         "NSCalendarsUsageDescription": "下班啦只读取日历日程，用来在本软件内同步提醒。",
