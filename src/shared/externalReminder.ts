@@ -21,6 +21,7 @@ export function createExternalReminderPatch(
       externalId: event.id,
       seriesId: event.seriesId || fallbackSource?.seriesId,
       title: event.title || fallbackSource?.title || '外部提醒事项',
+      isRecurring: event.isRecurring ?? fallbackSource?.isRecurring,
       lastSyncedAt: new Date().toISOString(),
       syncStatus: 'ok'
     }

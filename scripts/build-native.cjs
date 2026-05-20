@@ -9,48 +9,70 @@ if (process.platform !== 'darwin') {
   process.exit(0);
 }
 
-const arch = process.env.npm_config_arch || process.arch;
-const targetArch = arch === 'x64' ? 'x86_64' : 'arm64';
 const eventKitSource = join(root, 'native', 'EventKitBridge.swift');
 const eventKitPlist = join(root, 'native', 'EventKitBridge-Info.plist');
 const eventKitOutput = join(root, 'dist-electron', 'native', 'eventkit-bridge');
 const statusBarSource = join(root, 'native', 'StatusBarHelper.swift');
 const statusBarOutput = join(root, 'dist-electron', 'native', 'status-bar-helper');
+const universalArchs = ['arm64', 'x86_64'];
 
 mkdirSync(dirname(eventKitOutput), { recursive: true });
 
-runSwiftc([
-  eventKitSource,
-  '-target',
-  `${targetArch}-apple-macos13.0`,
-  '-framework',
-  'EventKit',
-  '-O',
-  '-Xlinker',
-  '-sectcreate',
-  '-Xlinker',
-  '__TEXT',
-  '-Xlinker',
-  '__info_plist',
-  '-Xlinker',
-  eventKitPlist,
-  '-o',
-  eventKitOutput
-]);
+buildUniversalBinary({
+  source: eventKitSource,
+  output: eventKitOutput,
+  framework: 'EventKit',
+  plist: eventKitPlist
+});
 
-runSwiftc([
-  statusBarSource,
-  '-target',
-  `${targetArch}-apple-macos13.0`,
-  '-framework',
-  'AppKit',
-  '-O',
-  '-o',
-  statusBarOutput
-]);
+buildUniversalBinary({
+  source: statusBarSource,
+  output: statusBarOutput,
+  framework: 'AppKit'
+});
+
+function buildUniversalBinary({ source, output, framework, plist }) {
+  const archOutputs = universalArchs.map((targetArch) => {
+    const archOutput = `${output}-${targetArch}`;
+    const args = [
+      source,
+      '-target',
+      `${targetArch}-apple-macos13.0`,
+      '-framework',
+      framework,
+      '-O',
+      '-o',
+      archOutput
+    ];
+
+    if (plist) {
+      args.splice(
+        args.length - 2,
+        0,
+        '-Xlinker',
+        '-sectcreate',
+        '-Xlinker',
+        '__TEXT',
+        '-Xlinker',
+        '__info_plist',
+        '-Xlinker',
+        plist
+      );
+    }
+
+    runSwiftc(args);
+    return archOutput;
+  });
+
+  runCommand('lipo', ['-create', ...archOutputs, '-output', output]);
+}
 
 function runSwiftc(args) {
-  const result = spawnSync('xcrun', ['swiftc', ...args], {
+  runCommand('xcrun', ['swiftc', ...args]);
+}
+
+function runCommand(command, args) {
+  const result = spawnSync(command, args, {
     cwd: root,
     stdio: 'inherit'
   });

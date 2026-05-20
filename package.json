@@ -15,7 +15,8 @@
     "build:main": "npm run build:native && tsc -p tsconfig.electron.json",
     "build:renderer": "vite build",
     "typecheck": "tsc --noEmit && tsc -p tsconfig.electron.json --noEmit",
-    "package": "npm run build && electron-builder"
+    "package": "npm run package:mac",
+    "package:mac": "npm run build && electron-builder --mac dmg --universal"
   },
   "devDependencies": {
     "@types/node": "^22.15.21",
@@ -78,8 +79,7 @@
         }
       ],
       "target": [
-        "dmg",
-        "zip"
+        "dmg"
       ]
     },
     "win": {

@@ -252,6 +252,11 @@ export class ReminderStore {
 
     for (const reminder of this.reminders) {
       if (!isRepeatingReminder(reminder)) {
+        if (reminder.linkedExternalSource?.provider === 'macos-reminders' && reminder.linkedExternalSource.isRecurring) {
+          // 本机重复提醒事项的下一次日期由系统提醒事项同步回来；完成当前实例后不能按一次性提醒清掉绑定。
+          nextReminders.push(reminder);
+          continue;
+        }
         if (shouldClearCompletedOnceReminder(reminder, todayKey)) {
           changed = true;
           continue;

@@ -14,6 +14,7 @@ export type LinkedExternalSource = {
   externalId: string;
   seriesId?: string;
   title: string;
+  isRecurring?: boolean;
   lastSyncedAt?: string;
   syncStatus?: 'ok' | 'error' | 'deleted' | 'unsupported';
   syncError?: string;
@@ -68,6 +69,7 @@ export type ExternalEvent = {
   title: string;
   startTime: string;
   completed?: boolean;
+  isRecurring?: boolean;
 };
 
 export type ExternalAccessKind = 'calendar' | 'reminders';

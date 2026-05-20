@@ -18,6 +18,7 @@ struct ExternalItem: Codable {
     let title: String
     let startTime: String
     let completed: Bool?
+    let isRecurring: Bool?
 }
 
 struct BridgeOutput: Codable {
@@ -156,7 +157,8 @@ func fetchCalendarEvents(_ store: EKEventStore) -> [ExternalItem] {
                 provider: "macos-calendar",
                 title: event.title?.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty == false ? event.title : "未命名日程",
                 startTime: isoString(startDate),
-                completed: false
+                completed: false,
+                isRecurring: hasRecurrenceRules(event)
             )
         }
 
@@ -165,7 +167,7 @@ func fetchCalendarEvents(_ store: EKEventStore) -> [ExternalItem] {
 
 func fetchReminders(_ store: EKEventStore) -> [ExternalItem] {
     let calendar = Calendar.current
-    let start = Date()
+    let start = calendar.startOfDay(for: Date())
     let end = calendar.date(byAdding: .day, value: lookAheadDays, to: start) ?? start
     let predicate = store.predicateForReminders(in: nil)
     let semaphore = DispatchSemaphore(value: 0)
@@ -202,7 +204,8 @@ func fetchReminders(_ store: EKEventStore) -> [ExternalItem] {
                 provider: "macos-reminders",
                 title: reminder.title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? "未命名提醒事项" : reminder.title,
                 startTime: isoString(dueDate),
-                completed: reminder.isCompleted
+                completed: reminder.isCompleted,
+                isRecurring: hasRecurrenceRules(reminder)
             )
         }
 
@@ -223,6 +226,10 @@ func nextItemsBySeries(_ items: [ExternalItem]) -> [ExternalItem] {
     }
 
     return nextItems
+}
+
+func hasRecurrenceRules(_ item: EKCalendarItem) -> Bool {
+    return item.recurrenceRules?.isEmpty == false
 }
 
 extension Array {

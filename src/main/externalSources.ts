@@ -87,6 +87,19 @@ export async function syncExternalSources(reminders: Reminder[]): Promise<{ remi
       }];
     }
 
+    if (!event && isRecurringExternalReminder(reminder)) {
+      syncedCount += 1;
+      return [{
+        ...reminder,
+        linkedExternalSource: {
+          ...reminder.linkedExternalSource,
+          lastSyncedAt: new Date().toISOString(),
+          syncStatus: 'ok' as const,
+          syncError: undefined
+        }
+      }];
+    }
+
     if (!event) {
       removedCount += 1;
       return [];
@@ -246,6 +259,7 @@ function isExternalEvent(event: unknown): event is ExternalEvent {
     && (candidate.seriesId === undefined || typeof candidate.seriesId === 'string')
     && typeof candidate.title === 'string'
     && typeof candidate.startTime === 'string'
+    && (candidate.isRecurring === undefined || typeof candidate.isRecurring === 'boolean')
     && !Number.isNaN(new Date(candidate.startTime).getTime());
 }
 
@@ -288,6 +302,11 @@ function getAccessKindForProvider(provider: ExternalProvider): ExternalAccessKin
 
 function isCalendarProvider(provider: ExternalProvider) {
   return provider === 'macos-calendar' || provider === 'windows-calendar';
+}
+
+function isRecurringExternalReminder(reminder: Reminder) {
+  return reminder.linkedExternalSource?.provider === 'macos-reminders'
+    && reminder.linkedExternalSource.isRecurring === true;
 }
 
 function isReminderMirrorExpired(reminder: Reminder, now = new Date()) {
