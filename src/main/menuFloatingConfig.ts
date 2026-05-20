@@ -12,7 +12,7 @@ export const MENU_FLOATING_SURFACE_SIZES: Record<MenuFloatingSurfaceKind, { widt
   'settings-display': { width: SETTINGS_TERTIARY_MENU_WIDTH, height: 220 },
   'settings-lock-screen': { width: SETTINGS_TERTIARY_MENU_WIDTH, height: 122 },
   'settings-theme': { width: SETTINGS_THEME_MENU_WIDTH, height: 116 },
-  'settings-about': { width: 520, height: 326 },
+  'settings-about': { width: 520, height: 358 },
   donation: { width: 292, height: 374 },
   'external-sync': { width: 292, height: 260 },
   'reminder-context': { width: 178, height: 260 },

@@ -232,8 +232,8 @@
   position: absolute;
   top: 50%;
   left: 50%;
-  width: 25%;
-  height: 25%;
+  width: 20%;
+  height: 20%;
   box-shadow: 0 0 0 3px #fff;
   object-fit: cover;
   transform: translate(-50%, -50%);
@@ -403,6 +403,106 @@
   background: transparent;
   text-decoration: none;
   transform: none;
+}
+
+.settings-about-community {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 120px;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  padding-top: 6px;
+}
+
+.settings-about-qr-button {
+  position: relative;
+  display: block;
+  justify-self: end;
+  width: 120px;
+  height: 120px;
+  min-height: 0;
+  padding: 0;
+  border: 1px solid var(--hairline);
+  border-radius: 7px;
+  background: #fff;
+  cursor: pointer;
+  overflow: hidden;
+}
+
+.settings-about-qr-button:hover,
+.settings-about-qr-button:active {
+  background: #fff;
+  transform: none;
+}
+
+.settings-about-qr-image {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.settings-about-qr-image-dark {
+  display: none;
+}
+
+.floating-surface-shell.theme-dark .settings-about-qr-button {
+  border-color: transparent;
+  background: transparent;
+}
+
+.floating-surface-shell.theme-dark .settings-about-qr-button:hover,
+.floating-surface-shell.theme-dark .settings-about-qr-button:active {
+  background: transparent;
+}
+
+.floating-surface-shell.theme-dark .settings-about-qr-image-light {
+  display: none;
+}
+
+.floating-surface-shell.theme-dark .settings-about-qr-image-dark {
+  display: block;
+}
+
+@media (prefers-color-scheme: dark) {
+  .floating-surface-shell:not(.theme-light) .settings-about-qr-button {
+    border-color: transparent;
+    background: transparent;
+  }
+
+  .floating-surface-shell:not(.theme-light) .settings-about-qr-button:hover,
+  .floating-surface-shell:not(.theme-light) .settings-about-qr-button:active {
+    background: transparent;
+  }
+
+  .floating-surface-shell:not(.theme-light) .settings-about-qr-image-light {
+    display: none;
+  }
+
+  .floating-surface-shell:not(.theme-light) .settings-about-qr-image-dark {
+    display: block;
+  }
+}
+
+.settings-about-qr-logo {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 25%;
+  height: 25%;
+  border-radius: 7px;
+  box-shadow: 0 0 0 3px #fff;
+  background: #fff;
+  object-fit: cover;
+  transform: translate(-50%, -50%);
+}
+
+.settings-about-community p {
+  margin: 0;
+  color: var(--muted);
+  font-size: var(--font-caption);
+  line-height: 1.55;
+  text-align: left;
+  white-space: nowrap;
 }
 
 .settings-message-list {

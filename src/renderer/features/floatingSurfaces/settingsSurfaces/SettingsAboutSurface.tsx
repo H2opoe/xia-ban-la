@@ -5,6 +5,8 @@ import { DEFAULT_APP_ABOUT_INFO } from './types';
 
 const WECHAT_GROUP_URL = 'https://u.wechat.com/EDsLZ6LQyemJxtrM-PlvT-k?s=3';
 const wechatGroupQrCodeUrl = new URL('../../../assets/about-wechat-group.svg', import.meta.url).href;
+const wechatGroupQrCodeDarkUrl = new URL('../../../assets/about-wechat-group-dark.svg', import.meta.url).href;
+const wechatLogoUrl = new URL('../../../assets/about-wechat-logo.png', import.meta.url).href;
 
 export function FloatingSettingsAboutMenu() {
   const [aboutInfo, setAboutInfo] = useState<AppAboutInfo>(DEFAULT_APP_ABOUT_INFO);
@@ -27,10 +29,12 @@ export function FloatingSettingsAboutMenu() {
       <div className="settings-about-row">Version {aboutInfo.version}</div>
       <div className="settings-about-row">Copyright © {aboutInfo.currentYear} 佛山市戴胜文化传媒有限公司</div>
       <div className="settings-about-community">
+        <p>添加作者入群，接收更新或反馈。</p>
         <button className="settings-about-qr-button" type="button" onClick={() => void window.xiabanla.openExternalLink(WECHAT_GROUP_URL)}>
-          <img src={wechatGroupQrCodeUrl} alt="添加作者进软件群二维码" />
+          <img className="settings-about-qr-image settings-about-qr-image-light" src={wechatGroupQrCodeUrl} alt="添加作者进软件群二维码" />
+          <img className="settings-about-qr-image settings-about-qr-image-dark" src={wechatGroupQrCodeDarkUrl} alt="" aria-hidden="true" />
+          <img className="settings-about-qr-logo" src={wechatLogoUrl} alt="" aria-hidden="true" />
         </button>
-        <p>添加作者进软件群，接收更新或提交反馈</p>
       </div>
     </FloatingMenuSurface>
   );
