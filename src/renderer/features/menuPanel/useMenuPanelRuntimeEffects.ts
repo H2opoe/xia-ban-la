@@ -47,18 +47,13 @@ type RuntimeEffectDeps = {
   shouldBlockMissingTitleEditExit: (reminder: Reminder) => boolean;
   suppressNextBlankCreateRef: MutableRefObject<boolean>;
   suppressTitleWarningOutsideClose: () => void;
-  syncLinkedExternalReminders: (options?: { silent?: boolean }) => Promise<void>;
   titleWarningReminderIdRef: MutableRefObject<string>;
 };
 
 export function useMenuPanelRuntimeEffects(deps: RuntimeEffectDeps) {
   useEffect(() => {
     void deps.refresh();
-    void deps.syncLinkedExternalReminders();
     const timer = window.setInterval(() => deps.setNow(new Date()), 1_000);
-    const externalSyncTimer = window.setInterval(() => {
-      void deps.syncLinkedExternalReminders({ silent: true });
-    }, 60_000);
     const unsubscribe = window.xiabanla.onRemindersUpdated((nextReminders) => {
       deps.setReminders(nextReminders);
     });
@@ -92,7 +87,6 @@ export function useMenuPanelRuntimeEffects(deps: RuntimeEffectDeps) {
     });
     return () => {
       window.clearInterval(timer);
-      window.clearInterval(externalSyncTimer);
       unsubscribe();
       unsubscribeReminderOverlayVisibility();
       unsubscribeReminderDeleteRequested();

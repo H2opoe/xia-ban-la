@@ -220,7 +220,6 @@ export function SettingsApp(props: { foregroundReminderActive?: boolean }) {
     shouldBlockMissingTitleEditExit,
     suppressNextBlankCreateRef,
     suppressTitleWarningOutsideClose,
-    syncLinkedExternalReminders,
     titleWarningReminderIdRef
   });
 
@@ -388,26 +387,6 @@ export function SettingsApp(props: { foregroundReminderActive?: boolean }) {
     await toggleFloatingSurfaceFromElement('external-sync', element, {
       placement: 'bottom-left'
     });
-  }
-
-  async function syncLinkedExternalReminders(options: { silent?: boolean } = {}) {
-    const currentReminders = reminders.length > 0 ? reminders : await window.xiabanla.getReminders();
-    const hasLinkedExternalReminder = currentReminders.some((reminder) => reminder.linkedExternalSource);
-    if (!hasLinkedExternalReminder) {
-      return;
-    }
-
-    try {
-      const result = await window.xiabanla.syncExternalSources();
-      await refresh();
-      if (!options.silent) {
-        setNotice(result.message);
-      }
-    } catch (error) {
-      if (!options.silent) {
-        setNotice(error instanceof Error ? error.message : '本机同步失败');
-      }
-    }
   }
 
   async function previewOffWorkReminder(reminder: Reminder) {

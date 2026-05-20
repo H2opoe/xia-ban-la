@@ -58,3 +58,8 @@ export function isExternalEventHistorical(event: ExternalEvent, now = new Date()
   todayStart.setHours(0, 0, 0, 0);
   return eventDate.getTime() < todayStart.getTime();
 }
+
+export function shouldShowExternalReminderInList(event: ExternalEvent) {
+  // 已完成状态仍由同步流程使用，这里只控制“本机提醒事项”可绑定列表的展示范围。
+  return event.provider === 'macos-reminders' && event.completed !== true && !isExternalEventHistorical(event);
+}

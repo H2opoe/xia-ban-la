@@ -10,7 +10,7 @@ import type {
   SyncResult
 } from '../shared/types.js';
 import { getDisplayInfos } from './displays.js';
-import { listExternalEvents, syncExternalSources } from './externalSources.js';
+import { listExternalEvents } from './externalSources.js';
 import type { ReminderScheduler } from './scheduler.js';
 import type { ReminderStore } from './store.js';
 
@@ -42,6 +42,7 @@ type RegisterIpcHandlersDeps = {
   openMenuFloatingSurface: (sender: Electron.WebContents, request: MenuFloatingSurfaceRequest) => Promise<void>;
   closeMenuFloatingWindows: (kind?: MenuFloatingSurfaceKind) => void;
   requestAppQuit: () => void;
+  syncExternalSourcesNow: () => Promise<SyncResult>;
   broadcastDefaultMessagesUpdated: () => void;
   broadcastDraftReminderUpdated: (id: string) => void;
   broadcastAppSettingsUpdated: () => void;
@@ -67,6 +68,7 @@ export function registerIpcHandlers(deps: RegisterIpcHandlersDeps) {
     openMenuFloatingSurface,
     closeMenuFloatingWindows,
     requestAppQuit,
+    syncExternalSourcesNow,
     broadcastDefaultMessagesUpdated,
     broadcastDraftReminderUpdated,
     broadcastAppSettingsUpdated,
@@ -114,9 +116,7 @@ export function registerIpcHandlers(deps: RegisterIpcHandlersDeps) {
   }
 
   async function syncExternalSourcesHandler(): Promise<SyncResult> {
-    const { reminders, result } = await syncExternalSources(store.getAll());
-    await store.updateAll(reminders);
-    return result;
+    return syncExternalSourcesNow();
   }
 
   ipcMain.handle('reminders:get', async () => {

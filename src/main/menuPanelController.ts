@@ -25,6 +25,7 @@ type MenuPanelControllerOptions = {
   loadRenderer: (windowItem: BrowserWindow, route?: string) => Promise<void>;
   requestBeforeHide: (windowItem: BrowserWindow) => Promise<boolean>;
   sendWindowMessage: (windowItem: BrowserWindow, channel: string, ...args: unknown[]) => boolean;
+  onDidShow?: () => void;
 };
 
 const MENU_PANEL_BLUR_HIDE_DELAY_MS = 360;
@@ -267,6 +268,7 @@ export class MenuPanelController {
       this.options.sendWindowMessage(windowItem, 'menu-panel:open-settings');
     }
     this.options.broadcastOverlayVisibility();
+    this.options.onDidShow?.();
     if (process.platform === 'darwin') {
       app.focus({ steal: true });
     }

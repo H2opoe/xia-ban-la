@@ -18,6 +18,8 @@ struct ExternalItem: Codable {
     let title: String
     let startTime: String
     let completed: Bool?
+    let completedAt: String?
+    let lastModifiedAt: String?
     let isRecurring: Bool?
 }
 
@@ -158,6 +160,8 @@ func fetchCalendarEvents(_ store: EKEventStore) -> [ExternalItem] {
                 title: event.title?.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty == false ? event.title : "未命名日程",
                 startTime: isoString(startDate),
                 completed: false,
+                completedAt: nil,
+                lastModifiedAt: event.lastModifiedDate.map { isoString($0) },
                 isRecurring: hasRecurrenceRules(event)
             )
         }
@@ -205,6 +209,8 @@ func fetchReminders(_ store: EKEventStore) -> [ExternalItem] {
                 title: reminder.title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? "未命名提醒事项" : reminder.title,
                 startTime: isoString(dueDate),
                 completed: reminder.isCompleted,
+                completedAt: reminder.completionDate.map { isoString($0) },
+                lastModifiedAt: reminder.lastModifiedDate.map { isoString($0) },
                 isRecurring: hasRecurrenceRules(reminder)
             )
         }

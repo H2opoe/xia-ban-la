@@ -7,8 +7,8 @@ import {
   formatExternalEventTitle,
   getExternalEmptyText,
   getExternalLoadingText,
-  isExternalEventHistorical,
-  isExternalEventLinked
+  isExternalEventLinked,
+  shouldShowExternalReminderInList
 } from '../../domain/externalEventViewModel';
 import { FloatingMenuSurface } from './floatingSurfaceModel';
 
@@ -22,7 +22,7 @@ export function FloatingExternalSyncMenu() {
   const [externalEventsLoading, setExternalEventsLoading] = useState(true);
   const [externalPanelTab, setExternalPanelTab] = useState<ExternalPanelTab>('calendar');
   const calendarExternalEvents = externalEvents.filter((event) => event.provider === 'macos-calendar' || event.provider === 'windows-calendar');
-  const reminderExternalEvents = externalEvents.filter((event) => event.provider === 'macos-reminders' && !isExternalEventHistorical(event));
+  const reminderExternalEvents = externalEvents.filter(shouldShowExternalReminderInList);
   const activeExternalEvents = externalPanelTab === 'calendar' ? calendarExternalEvents : reminderExternalEvents;
   const activeExternalEmptyText = getExternalEmptyText(externalPanelTab, externalAccess);
 

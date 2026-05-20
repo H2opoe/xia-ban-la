@@ -69,6 +69,8 @@ export type ExternalEvent = {
   title: string;
   startTime: string;
   completed?: boolean;
+  completedAt?: string;
+  lastModifiedAt?: string;
   isRecurring?: boolean;
 };
 

@@ -16,6 +16,7 @@ import type {
 } from '../shared/types.js';
 import { getExternalAccessInstruction } from '../shared/externalAccessMessages.js';
 import { createExternalReminderPatch, getExternalEventLinkKeys, getExternalSourceLinkKeys } from '../shared/externalReminder.js';
+import { toDateKey } from '../shared/reminderSchedule.js';
 
 const execFileAsync = promisify(execFile);
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -87,19 +88,6 @@ export async function syncExternalSources(reminders: Reminder[]): Promise<{ remi
       }];
     }
 
-    if (!event && isRecurringExternalReminder(reminder)) {
-      syncedCount += 1;
-      return [{
-        ...reminder,
-        linkedExternalSource: {
-          ...reminder.linkedExternalSource,
-          lastSyncedAt: new Date().toISOString(),
-          syncStatus: 'ok' as const,
-          syncError: undefined
-        }
-      }];
-    }
-
     if (!event) {
       removedCount += 1;
       return [];
@@ -109,20 +97,47 @@ export async function syncExternalSources(reminders: Reminder[]): Promise<{ remi
     const externalPatch = createExternalReminderPatch(event, reminder.linkedExternalSource);
     const isExternalReminder = event.provider === 'macos-reminders';
     const syncedCompleted = isExternalReminder ? Boolean(event.completed) : false;
-    const shouldRestoreForNextExternalOccurrence = Boolean(
-      reminder.completed
-      && !isExternalReminder
-      && (
-        reminder.linkedExternalSource.externalId !== externalPatch.linkedExternalSource.externalId
-        || reminder.scheduledDate !== externalPatch.scheduledDate
-        || reminder.dailyTime !== externalPatch.dailyTime
-      )
-    );
+    const occurrenceChanged = hasExternalOccurrenceChanged(reminder, externalPatch);
+    const shouldRestoreForManualFutureMove = shouldRestoreCompletedAfterManualExternalFutureMove(reminder, event, externalPatch, occurrenceChanged);
+    const shouldMarkCurrentRecurringOccurrenceCompleted = shouldHoldCurrentRecurringOccurrence(reminder, event, externalPatch, occurrenceChanged);
+    const shouldKeepCompletedRecurringOccurrence = shouldDeferRecurringOccurrenceUntilTomorrow(reminder, event, occurrenceChanged);
+    const currentCompletedAt = getCurrentOccurrenceCompletedAt(reminder, event);
+    const currentOccurrenceDate = getCurrentOccurrenceDate(reminder, event, externalPatch);
+    if (shouldRestoreForManualFutureMove) {
+      return [{
+        ...reminder,
+        ...externalPatch,
+        completed: false,
+        completedAt: undefined,
+        linkedExternalSource: {
+          ...externalPatch.linkedExternalSource,
+          syncStatus: 'ok' as const,
+          syncError: undefined
+        }
+      }];
+    }
+
+    if (shouldMarkCurrentRecurringOccurrenceCompleted || shouldKeepCompletedRecurringOccurrence) {
+      return [{
+        ...reminder,
+        scheduledDate: currentOccurrenceDate,
+        completed: true,
+        completedAt: currentCompletedAt,
+        linkedExternalSource: {
+          ...reminder.linkedExternalSource,
+          isRecurring: externalPatch.linkedExternalSource.isRecurring,
+          lastSyncedAt: new Date().toISOString(),
+          syncStatus: 'ok' as const,
+          syncError: undefined
+        }
+      }];
+    }
+
     return [{
       ...reminder,
       ...externalPatch,
-      completed: isExternalReminder ? syncedCompleted : (shouldRestoreForNextExternalOccurrence ? false : reminder.completed),
-      completedAt: getSyncedCompletedAt(reminder, isExternalReminder, syncedCompleted, shouldRestoreForNextExternalOccurrence),
+      completed: getSyncedCompleted(reminder, isExternalReminder, syncedCompleted),
+      completedAt: getSyncedCompletedAt(reminder, isExternalReminder, syncedCompleted),
       linkedExternalSource: {
         ...externalPatch.linkedExternalSource,
         syncStatus: 'ok' as const,
@@ -259,6 +274,8 @@ function isExternalEvent(event: unknown): event is ExternalEvent {
     && (candidate.seriesId === undefined || typeof candidate.seriesId === 'string')
     && typeof candidate.title === 'string'
     && typeof candidate.startTime === 'string'
+    && (candidate.completedAt === undefined || typeof candidate.completedAt === 'string')
+    && (candidate.lastModifiedAt === undefined || typeof candidate.lastModifiedAt === 'string')
     && (candidate.isRecurring === undefined || typeof candidate.isRecurring === 'boolean')
     && !Number.isNaN(new Date(candidate.startTime).getTime());
 }
@@ -304,9 +321,143 @@ function isCalendarProvider(provider: ExternalProvider) {
   return provider === 'macos-calendar' || provider === 'windows-calendar';
 }
 
-function isRecurringExternalReminder(reminder: Reminder) {
-  return reminder.linkedExternalSource?.provider === 'macos-reminders'
-    && reminder.linkedExternalSource.isRecurring === true;
+function hasExternalOccurrenceChanged(reminder: Reminder, externalPatch: ReturnType<typeof createExternalReminderPatch>) {
+  return reminder.linkedExternalSource?.externalId !== externalPatch.linkedExternalSource.externalId
+    || reminder.scheduledDate !== externalPatch.scheduledDate
+    || reminder.dailyTime !== externalPatch.dailyTime;
+}
+
+function shouldDeferRecurringOccurrenceUntilTomorrow(reminder: Reminder, event: ExternalEvent, occurrenceChanged: boolean) {
+  return Boolean(
+    reminder.completed
+    && isCompletedToday(reminder)
+    && event.isRecurring
+    && occurrenceChanged
+    && event.completed !== false
+  );
+}
+
+function shouldHoldCurrentRecurringOccurrence(
+  reminder: Reminder,
+  event: ExternalEvent,
+  externalPatch: ReturnType<typeof createExternalReminderPatch>,
+  occurrenceChanged: boolean,
+  now = new Date()
+) {
+  const todayKey = toDateKey(now);
+  return Boolean(
+    event.isRecurring
+    && externalPatch.scheduledDate > todayKey
+    && (
+      isExternalCompletedToday(event, now)
+      || (
+        occurrenceChanged
+        && reminder.scheduledDate === todayKey
+      )
+    )
+  );
+}
+
+function shouldRestoreCompletedAfterManualExternalFutureMove(
+  reminder: Reminder,
+  event: ExternalEvent,
+  externalPatch: ReturnType<typeof createExternalReminderPatch>,
+  occurrenceChanged: boolean,
+  now = new Date()
+) {
+  // 重复提醒事项完成后，系统可能把同一条记录推到下次并返回 completed=false；
+  // 只有外部修改时间晚于本地完成时间，才把它视为用户手动改期。
+  // 日历没有完成状态，只能用外部修改时间晚于本地完成时间来识别手动改期。
+  return Boolean(
+    reminder.completed
+    && occurrenceChanged
+    && isExternalPatchScheduledInFuture(externalPatch, now)
+    && isExternalManualFutureMove(reminder, event)
+  );
+}
+
+function isExternalManualFutureMove(reminder: Reminder, event: ExternalEvent) {
+  if (event.provider !== 'macos-reminders') {
+    return isExternalItemModifiedAfterLocalCompletion(reminder, event);
+  }
+
+  if (event.completed !== false) {
+    return false;
+  }
+
+  return event.isRecurring ? isExternalItemModifiedAfterLocalCompletion(reminder, event) : true;
+}
+
+function isExternalItemModifiedAfterLocalCompletion(reminder: Reminder, event: ExternalEvent) {
+  const completedAt = parseDateTime(reminder.completedAt);
+  const lastModifiedAt = parseDateTime(event.lastModifiedAt);
+  if (!completedAt || !lastModifiedAt) {
+    return false;
+  }
+
+  return lastModifiedAt.getTime() > completedAt.getTime();
+}
+
+function isExternalPatchScheduledInFuture(externalPatch: ReturnType<typeof createExternalReminderPatch>, now: Date) {
+  const [hour = 0, minute = 0] = externalPatch.dailyTime.split(':').map(Number);
+  const scheduledAt = new Date(`${externalPatch.scheduledDate}T${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')}:00`);
+  return !Number.isNaN(scheduledAt.getTime()) && scheduledAt.getTime() > now.getTime();
+}
+
+function getCurrentOccurrenceCompletedAt(reminder: Reminder, event: ExternalEvent, now = new Date()) {
+  const externalCompletedAt = parseDateTime(event.completedAt);
+  if (externalCompletedAt) {
+    return externalCompletedAt.toISOString();
+  }
+  const localCompletedAt = parseDateTime(reminder.completedAt);
+  if (localCompletedAt) {
+    return localCompletedAt.toISOString();
+  }
+  return now.toISOString();
+}
+
+function getCurrentOccurrenceDate(
+  reminder: Reminder,
+  event: ExternalEvent,
+  externalPatch: ReturnType<typeof createExternalReminderPatch>,
+  now = new Date()
+) {
+  const todayKey = toDateKey(now);
+  if (isExternalCompletedToday(event, now) && externalPatch.scheduledDate > todayKey) {
+    return todayKey;
+  }
+  return reminder.scheduledDate;
+}
+
+function isExternalCompletedToday(event: ExternalEvent, now = new Date()) {
+  const completedAt = parseDateTime(event.completedAt);
+  if (!completedAt) {
+    return false;
+  }
+
+  return toDateKey(completedAt) === toDateKey(now);
+}
+
+function parseDateTime(value?: string) {
+  if (!value) {
+    return null;
+  }
+
+  const date = new Date(value);
+  return Number.isNaN(date.getTime()) ? null : date;
+}
+
+function isCompletedToday(reminder: Reminder, now = new Date()) {
+  if (!reminder.completedAt) {
+    return false;
+  }
+
+  const completedAt = new Date(reminder.completedAt);
+  if (Number.isNaN(completedAt.getTime())) {
+    return false;
+  }
+
+  return toDateKey(completedAt) === toDateKey(now);
 }
 
 function isReminderMirrorExpired(reminder: Reminder, now = new Date()) {
@@ -318,16 +469,23 @@ function isReminderMirrorExpired(reminder: Reminder, now = new Date()) {
 function getSyncedCompletedAt(
   reminder: Reminder,
   isExternalReminder: boolean,
-  externalCompleted: boolean,
-  shouldRestore: boolean
+  externalCompleted: boolean
 ) {
   if (isExternalReminder && externalCompleted) {
     return reminder.completedAt || new Date().toISOString();
   }
-  if (isExternalReminder || shouldRestore) {
+  if (isExternalReminder) {
     return undefined;
   }
   return reminder.completedAt;
+}
+
+function getSyncedCompleted(
+  reminder: Reminder,
+  isExternalReminder: boolean,
+  externalCompleted: boolean
+) {
+  return isExternalReminder ? externalCompleted : reminder.completed;
 }
 
 function getSyncSuccessMessage(syncedCount: number, removedCount: number) {

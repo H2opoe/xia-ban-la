@@ -4,6 +4,7 @@ import { dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import type { Reminder, ReminderPayload } from '../shared/types.js';
 import { registerApplicationMenu } from './applicationMenu.js';
+import { ExternalSyncService } from './externalSyncService.js';
 import { registerIpcHandlers } from './ipcHandlers.js';
 import { MenuPanelController } from './menuPanelController.js';
 import { MenuFloatingController } from './menuFloatingController.js';
@@ -18,6 +19,7 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const store = new ReminderStore();
 
 let scheduler: ReminderScheduler;
+let externalSyncService: ExternalSyncService | null = null;
 const reminderPayloads = new Map<number, ReminderPayload>();
 const previewReminderSourceIds = new Map<string, string>();
 const draftReminders = new Map<string, Reminder>();
@@ -59,7 +61,10 @@ menuPanel = new MenuPanelController({
   showFloatingWindowAbovePanel: (windowItem) => menuFloating.showWindowAbovePanel(windowItem),
   loadRenderer,
   requestBeforeHide: requestMenuPanelBeforeHide,
-  sendWindowMessage
+  sendWindowMessage,
+  onDidShow: () => {
+    void externalSyncService?.syncNow();
+  }
 });
 statusBarEntry = new StatusBarEntry({
   dirname: __dirname,
@@ -74,6 +79,7 @@ if (process.platform === 'darwin') {
 
 void app.whenReady().then(async () => {
   await store.init();
+  externalSyncService = new ExternalSyncService(store);
   scheduler = new ReminderScheduler(
     store,
     (reminder, options) => reminderOverlays.showWindows(reminder, options),
@@ -96,6 +102,11 @@ void app.whenReady().then(async () => {
     openMenuFloatingSurface: (sender, request) => menuFloating.openSurface(sender, request),
     closeMenuFloatingWindows: (kind) => menuFloating.closeWindows(kind),
     requestAppQuit,
+    syncExternalSourcesNow: () => externalSyncService?.syncNow() ?? Promise.resolve({
+      ok: true,
+      syncedCount: 0,
+      message: '没有需要同步的外部提醒'
+    }),
     broadcastDefaultMessagesUpdated,
     broadcastDraftReminderUpdated,
     broadcastAppSettingsUpdated,
@@ -108,6 +119,7 @@ void app.whenReady().then(async () => {
   registerPowerRecoveryHandlers();
   statusBarEntry.applyRuntimeIcons();
   scheduler.start();
+  externalSyncService.start();
 
   screen.on('display-added', () => broadcastReminders());
   screen.on('display-removed', () => broadcastReminders());
@@ -206,6 +218,7 @@ function cleanupBeforeQuit() {
   reminderOverlays.closeAllForQuit();
   statusBarEntry.cleanup();
   globalShortcut.unregisterAll();
+  externalSyncService?.stop();
   scheduler?.stop();
 }
 
