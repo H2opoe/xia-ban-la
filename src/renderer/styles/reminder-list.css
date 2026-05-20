@@ -63,12 +63,15 @@
   gap: 5px;
   align-content: start;
   min-height: 0;
-  overflow: auto;
+  overflow: hidden;
   padding-right: 13px;
 }
 
 .quick-create-list {
   min-height: 92px;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
   cursor: text;
 }
 
@@ -412,4 +415,3 @@ input.inline-title-input {
   background: transparent;
   text-overflow: clip;
 }
-

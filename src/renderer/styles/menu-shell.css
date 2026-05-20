@@ -317,3 +317,6 @@
   animation: floating-surface-enter var(--motion-duration) var(--motion-ease) both;
 }
 
+.floating-surface-fill::after {
+  content: none !important;
+}

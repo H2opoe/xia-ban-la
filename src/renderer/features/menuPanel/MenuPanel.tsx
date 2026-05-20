@@ -188,6 +188,7 @@ export function SettingsApp(props: { foregroundReminderActive?: boolean }) {
     collapseOffWorkExpandedCard,
     deleteReminder,
     expandedId,
+    expandedIdRef,
     finishQuickEdit,
     foregroundReminderActive,
     getMissingTitleReminderForInteraction,

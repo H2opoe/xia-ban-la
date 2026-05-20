@@ -191,6 +191,7 @@ export type ReminderApi = {
   onAppSettingsUpdated(callback: (settings: AppSettings) => void): () => void;
   onReminderPayloadUpdated(callback: (payload: ReminderPayload) => void): () => void;
   onMenuPanelWillHide(callback: () => void): () => void;
+  onMenuPanelBeforeHide(callback: () => boolean | Promise<boolean>): () => void;
   onMenuPanelDidShow(callback: () => void): () => void;
   onMenuPanelOpenSettings(callback: () => void): () => void;
   onMenuFloatingSurfaceClosed(callback: (kind: MenuFloatingSurfaceKind) => void): () => void;

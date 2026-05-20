@@ -23,6 +23,7 @@ type MenuPanelControllerOptions = {
   isManagedFloatingWindow: (windowItem: BrowserWindow) => boolean;
   showFloatingWindowAbovePanel: (windowItem: BrowserWindow) => void;
   loadRenderer: (windowItem: BrowserWindow, route?: string) => Promise<void>;
+  requestBeforeHide: (windowItem: BrowserWindow) => Promise<boolean>;
   sendWindowMessage: (windowItem: BrowserWindow, channel: string, ...args: unknown[]) => boolean;
 };
 
@@ -34,6 +35,7 @@ export class MenuPanelController {
   private window: BrowserWindow | null = null;
   private hideTimer: NodeJS.Timeout | null = null;
   private blurTimer: NodeJS.Timeout | null = null;
+  private hideRequestInFlight = false;
   private keepOpenUntil = 0;
   private shouldOpenSettings = false;
 
@@ -49,7 +51,7 @@ export class MenuPanelController {
     }
 
     if (this.window && !this.window.isDestroyed() && this.window.isVisible()) {
-      this.hideWithAnimation(this.window);
+      void this.hideWithAnimation(this.window);
       return;
     }
 
@@ -145,7 +147,7 @@ export class MenuPanelController {
       return;
     }
 
-    this.hideWithAnimation(this.window);
+    void this.hideWithAnimation(this.window);
   }
 
   hideAfterAppDeactivation() {
@@ -158,7 +160,7 @@ export class MenuPanelController {
       return;
     }
 
-    this.hideWithAnimation(this.window);
+    void this.hideWithAnimation(this.window);
   }
 
   keepOpenForInternalInteraction() {
@@ -204,7 +206,7 @@ export class MenuPanelController {
         windowItem.focus();
         return;
       }
-      this.hideWithAnimation(windowItem);
+      void this.hideWithAnimation(windowItem);
     }, MENU_PANEL_BLUR_HIDE_DELAY_MS);
   }
 
@@ -235,6 +237,7 @@ export class MenuPanelController {
 
     clearTimeout(this.hideTimer);
     this.hideTimer = null;
+    this.hideRequestInFlight = false;
   }
 
   closeWindow() {
@@ -270,12 +273,19 @@ export class MenuPanelController {
     windowItem.focus();
   }
 
-  private hideWithAnimation(windowItem: BrowserWindow) {
-    if (this.hideTimer || windowItem.isDestroyed() || !windowItem.isVisible()) {
+  private async hideWithAnimation(windowItem: BrowserWindow) {
+    if (this.hideTimer || this.hideRequestInFlight || windowItem.isDestroyed() || !windowItem.isVisible()) {
       return;
     }
 
     this.clearBlurTimer();
+    this.hideRequestInFlight = true;
+    const canHide = await this.options.requestBeforeHide(windowItem);
+    this.hideRequestInFlight = false;
+    if (!canHide || windowItem.isDestroyed() || !windowItem.isVisible()) {
+      return;
+    }
+
     this.options.sendWindowMessage(windowItem, 'menu-panel:will-hide');
     this.options.closeFloatingWindows();
     this.hideTimer = setTimeout(() => {

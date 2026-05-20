@@ -67,6 +67,20 @@ const api: ReminderApi = {
     ipcRenderer.on('menu-panel:will-hide', handler);
     return () => ipcRenderer.off('menu-panel:will-hide', handler);
   },
+  onMenuPanelBeforeHide: (callback) => {
+    const handler = async (_event: Electron.IpcRendererEvent, requestId: string) => {
+      let canHide = true;
+      try {
+        canHide = await callback();
+      } catch (error) {
+        console.error('隐藏菜单面板前保存编辑失败', error);
+        canHide = false;
+      }
+      ipcRenderer.send(`menu-panel:before-hide-result:${requestId}`, canHide);
+    };
+    ipcRenderer.on('menu-panel:before-hide', handler);
+    return () => ipcRenderer.off('menu-panel:before-hide', handler);
+  },
   onMenuPanelDidShow: (callback: () => void) => {
     const handler = () => callback();
     ipcRenderer.on('menu-panel:did-show', handler);

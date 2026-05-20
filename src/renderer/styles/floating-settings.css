@@ -170,8 +170,7 @@
   box-sizing: border-box;
   width: 100%;
   max-height: calc(100vh - 16px);
-  overflow: auto;
-  overscroll-behavior: contain;
+  overflow: hidden;
   padding: 9px 10px;
 }
 
@@ -183,8 +182,7 @@
 .settings-display-submenu {
   gap: 7px;
   max-height: 220px;
-  overflow: auto;
-  overscroll-behavior: contain;
+  overflow: hidden;
   padding: 8px;
 }
 
@@ -301,8 +299,7 @@
   display: grid;
   gap: 6px;
   max-height: 244px;
-  overflow: auto;
-  overscroll-behavior: contain;
+  overflow: hidden;
 }
 
 .settings-message-row {
@@ -363,4 +360,3 @@
   color: var(--accent-contrast);
   background: var(--accent);
 }
-

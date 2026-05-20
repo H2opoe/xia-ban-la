@@ -94,8 +94,7 @@
   display: grid;
   width: 156px;
   max-height: calc(100vh - 16px);
-  overflow: auto;
-  overscroll-behavior: contain;
+  overflow: hidden;
   opacity: 0;
   pointer-events: none;
   transform: translateY(5px) scale(0.97);
@@ -338,4 +337,3 @@
 .context-danger {
   color: #ff8a80 !important;
 }
-

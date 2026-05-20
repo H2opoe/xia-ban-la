@@ -15,6 +15,7 @@ type RuntimeEffectDeps = {
   collapseOffWorkExpandedCard: () => void;
   deleteReminder: (reminder: Reminder) => Promise<void>;
   expandedId: string;
+  expandedIdRef: MutableRefObject<string>;
   finishQuickEdit: (reminderId: string) => boolean;
   foregroundReminderActive: boolean;
   getMissingTitleReminderForInteraction: () => Reminder | null;
@@ -130,6 +131,24 @@ export function useMenuPanelRuntimeEffects(deps: RuntimeEffectDeps) {
         resetTimer = null;
       }, MENU_PANEL_ANIMATION_MS + 80);
     });
+    const unsubscribeBeforeHide = window.xiabanla.onMenuPanelBeforeHide(() => {
+      if (deps.activeFloatingSurfaceRef.current === 'title-warning') {
+        return true;
+      }
+
+      const missingTitleReminder = deps.getMissingTitleReminderForInteraction();
+      if (missingTitleReminder) {
+        void deps.openTitleWarningMenu(missingTitleReminder);
+        return false;
+      }
+
+      const activeEditId = deps.expandedIdRef.current || deps.newReminderDraftRef.current?.id || '';
+      if (activeEditId && !deps.finishQuickEdit(activeEditId)) {
+        return false;
+      }
+
+      return true;
+    });
     const unsubscribeDidShow = window.xiabanla.onMenuPanelDidShow(() => {
       clearResetTimer();
       deps.setMenuPanelExiting(false);
@@ -162,6 +181,7 @@ export function useMenuPanelRuntimeEffects(deps: RuntimeEffectDeps) {
     return () => {
       clearResetTimer();
       clearRestoreWarningFrame();
+      unsubscribeBeforeHide();
       unsubscribeWillHide();
       unsubscribeDidShow();
       unsubscribeOpenSettings();
@@ -182,8 +202,7 @@ export function useMenuPanelRuntimeEffects(deps: RuntimeEffectDeps) {
         return;
       }
       if (deps.activeFloatingSurfaceRef.current === 'title-warning') {
-        deps.suppressTitleWarningOutsideClose();
-        void deps.closeFloatingSurface('title-warning');
+        void window.xiabanla.hideMenuPanel();
         return;
       }
       const missingTitleReminder = deps.getMissingTitleReminderForInteraction();

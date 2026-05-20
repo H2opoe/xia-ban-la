@@ -62,7 +62,7 @@
   gap: 6px;
   width: 176px;
   max-height: 220px;
-  overflow: auto;
+  overflow: hidden;
   margin-top: 0;
   padding: 8px;
   transform-origin: left top;
@@ -238,6 +238,9 @@
 
 .external-popover-list {
   max-height: 164px;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
   padding-right: 0;
 }
 
@@ -376,4 +379,3 @@
     transform: scaleX(0);
   }
 }
-

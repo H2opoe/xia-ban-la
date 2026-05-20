@@ -1,4 +1,5 @@
-import { app, BrowserWindow, globalShortcut, powerMonitor, screen } from 'electron';
+import { app, BrowserWindow, globalShortcut, ipcMain, powerMonitor, screen } from 'electron';
+import { randomUUID } from 'node:crypto';
 import { dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import type { Reminder, ReminderPayload } from '../shared/types.js';
@@ -57,6 +58,7 @@ menuPanel = new MenuPanelController({
   isManagedFloatingWindow: (windowItem) => menuFloating.isManagedWindow(windowItem),
   showFloatingWindowAbovePanel: (windowItem) => menuFloating.showWindowAbovePanel(windowItem),
   loadRenderer,
+  requestBeforeHide: requestMenuPanelBeforeHide,
   sendWindowMessage
 });
 statusBarEntry = new StatusBarEntry({
@@ -170,6 +172,33 @@ function requestAppQuit() {
   statusBarEntry.setQuitting(true);
   cleanupBeforeQuit();
   app.quit();
+}
+
+function requestMenuPanelBeforeHide(windowItem: BrowserWindow) {
+  if (windowItem.isDestroyed() || windowItem.webContents.isDestroyed()) {
+    return Promise.resolve(true);
+  }
+
+  const requestId = randomUUID();
+  const resultChannel = `menu-panel:before-hide-result:${requestId}`;
+
+  return new Promise<boolean>((resolve) => {
+    const timeout = setTimeout(() => {
+      ipcMain.removeAllListeners(resultChannel);
+      resolve(true);
+    }, 700);
+
+    ipcMain.once(resultChannel, (_event, canHide: boolean) => {
+      clearTimeout(timeout);
+      resolve(Boolean(canHide));
+    });
+
+    if (!sendWindowMessage(windowItem, 'menu-panel:before-hide', requestId)) {
+      clearTimeout(timeout);
+      ipcMain.removeAllListeners(resultChannel);
+      resolve(true);
+    }
+  });
 }
 
 function cleanupBeforeQuit() {
