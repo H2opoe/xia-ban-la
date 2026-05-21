@@ -4,12 +4,14 @@ import Foundation
 final class StatusBarDelegate: NSObject, NSApplicationDelegate {
     private let targetPid: pid_t
     private let iconPath: String?
+    private let boundsFilePath: String?
     private var statusItem: NSStatusItem?
     private var parentWatcher: Timer?
 
-    init(targetPid: pid_t, iconPath: String?) {
+    init(targetPid: pid_t, iconPath: String?, boundsFilePath: String?) {
         self.targetPid = targetPid
         self.iconPath = iconPath
+        self.boundsFilePath = boundsFilePath
     }
 
     func applicationDidFinishLaunching(_ notification: Notification) {
@@ -22,6 +24,10 @@ final class StatusBarDelegate: NSObject, NSApplicationDelegate {
         item.button?.sendAction(on: [.leftMouseUp, .rightMouseUp])
         statusItem = item
         applyStatusIcon()
+        writeStatusItemBounds()
+        DispatchQueue.main.async { [weak self] in
+            self?.writeStatusItemBounds()
+        }
 
         parentWatcher = Timer.scheduledTimer(withTimeInterval: 2, repeats: true) { [weak self] _ in
             self?.terminateIfParentExited()
@@ -33,6 +39,7 @@ final class StatusBarDelegate: NSObject, NSApplicationDelegate {
             return
         }
 
+        writeStatusItemBounds()
         if NSApp.currentEvent?.type == .rightMouseUp {
             kill(targetPid, SIGUSR2)
             return
@@ -57,6 +64,30 @@ final class StatusBarDelegate: NSObject, NSApplicationDelegate {
         statusItem?.button?.title = ""
         statusItem?.button?.image = image
         statusItem?.button?.imagePosition = .imageOnly
+        writeStatusItemBounds()
+    }
+
+    private func writeStatusItemBounds() {
+        guard let boundsFilePath,
+              let button = statusItem?.button,
+              let window = button.window,
+              let screen = window.screen else {
+            return
+        }
+
+        let screenBounds = screen.frame
+        let buttonBounds = window.convertToScreen(button.frame)
+        // Electron 使用屏幕左上角为原点；AppKit 的全局坐标以左下角为原点，需要在同一块屏幕内转换。
+        let electronY = screenBounds.maxY - buttonBounds.maxY + screenBounds.minY
+        let payload = """
+        {"x":\(Int(buttonBounds.origin.x.rounded())),"y":\(Int(electronY.rounded())),"width":\(Int(buttonBounds.width.rounded())),"height":\(Int(buttonBounds.height.rounded()))}
+        """
+
+        do {
+            try payload.write(toFile: boundsFilePath, atomically: true, encoding: .utf8)
+        } catch {
+            NSLog("Failed to write status item bounds: \(error.localizedDescription)")
+        }
     }
 
     private func terminateIfParentExited() {
@@ -96,7 +127,8 @@ func parseTargetPid() -> pid_t {
 let app = NSApplication.shared
 let delegate = StatusBarDelegate(
     targetPid: parseTargetPid(),
-    iconPath: parseArgumentValue("--icon")
+    iconPath: parseArgumentValue("--icon"),
+    boundsFilePath: parseArgumentValue("--bounds-file")
 )
 app.delegate = delegate
 app.run()

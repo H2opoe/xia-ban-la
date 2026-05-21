@@ -1,4 +1,4 @@
-import { app, BrowserWindow, globalShortcut } from 'electron';
+import electron from 'electron/main';
 import { execFile } from 'node:child_process';
 import { join } from 'node:path';
 import { createReminderPayload } from '../shared/reminderPayload.js';
@@ -7,6 +7,9 @@ import { getDisplayInfos } from './displays.js';
 import { createAppIcon } from './icons.js';
 import type { ReminderActionSession } from './reminderActionSession.js';
 import type { ReminderStore } from './store.js';
+
+const { app, BrowserWindow, globalShortcut } = electron;
+type BrowserWindow = Electron.BrowserWindow;
 
 const REMINDER_ESCAPE_SHORTCUT = 'Escape';
 const REMINDER_WINDOW_REASSERT_INTERVAL_MS = 3_000;

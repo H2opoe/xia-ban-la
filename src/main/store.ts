@@ -1,4 +1,4 @@
-import { app, screen } from 'electron';
+import electron from 'electron/main';
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import {
@@ -23,6 +23,8 @@ import {
   shouldResetCompletedRepeatingReminder,
   shouldRestoreCompletedAfterFutureReschedule
 } from './reminderStoreRules.js';
+
+const { app, screen } = electron;
 
 type StoreFile = {
   reminders: Reminder[];

@@ -1,10 +1,20 @@
-import { app, BrowserWindow, nativeTheme, Tray } from 'electron';
+import electron from 'electron/main';
 import { spawn, type ChildProcess } from 'node:child_process';
-import { existsSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { createAppIcon, createTrayIcon, getTrayIconPath } from './icons.js';
 
+const { app, BrowserWindow, nativeTheme, Tray } = electron;
+type Tray = Electron.Tray;
+
 const STATUS_BAR_HELPER_NAME = 'status-bar-helper';
+
+export type StatusBarAnchorBounds = {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+};
 
 type StatusBarEntryOptions = {
   dirname: string;
@@ -15,6 +25,7 @@ type StatusBarEntryOptions = {
 export class StatusBarEntry {
   private tray: Tray | null = null;
   private statusBarHelper: ChildProcess | null = null;
+  private helperBoundsPath: string | null = null;
   private isQuitting = false;
 
   constructor(private readonly options: StatusBarEntryOptions) {}
@@ -47,8 +58,26 @@ export class StatusBarEntry {
     }
   }
 
-  getTray() {
-    return this.tray;
+  getAnchorBounds(): StatusBarAnchorBounds | null {
+    const trayBounds = this.tray?.getBounds();
+    if (trayBounds && trayBounds.width > 0 && trayBounds.height > 0) {
+      return trayBounds;
+    }
+
+    return this.readHelperBounds();
+  }
+
+  async waitForAnchorBounds(timeoutMs = 300) {
+    const startedAt = Date.now();
+    while (Date.now() - startedAt < timeoutMs) {
+      const bounds = this.getAnchorBounds();
+      if (bounds) {
+        return bounds;
+      }
+      await new Promise((resolve) => setTimeout(resolve, 25));
+    }
+
+    return this.getAnchorBounds();
   }
 
   setQuitting(isQuitting: boolean) {
@@ -66,11 +95,14 @@ export class StatusBarEntry {
       return false;
     }
 
+    this.helperBoundsPath = join(app.getPath('userData'), 'status-bar-bounds.json');
     this.statusBarHelper = spawn(helperPath, [
       '--pid',
       String(process.pid),
       '--icon',
-      getTrayIconPath()
+      getTrayIconPath(),
+      '--bounds-file',
+      this.helperBoundsPath
     ], {
       stdio: 'ignore'
     });
@@ -111,6 +143,35 @@ export class StatusBarEntry {
     }
 
     return join(this.options.dirname, '..', 'native', helperName);
+  }
+
+  private readHelperBounds() {
+    if (!this.helperBoundsPath || !existsSync(this.helperBoundsPath)) {
+      return null;
+    }
+
+    try {
+      const parsed = JSON.parse(readFileSync(this.helperBoundsPath, 'utf8')) as Partial<StatusBarAnchorBounds>;
+      if (
+        typeof parsed.x === 'number'
+        && typeof parsed.y === 'number'
+        && typeof parsed.width === 'number'
+        && typeof parsed.height === 'number'
+        && parsed.width > 0
+        && parsed.height > 0
+      ) {
+        return {
+          x: parsed.x,
+          y: parsed.y,
+          width: parsed.width,
+          height: parsed.height
+        };
+      }
+    } catch (error) {
+      console.warn('读取菜单栏图标位置失败', error);
+    }
+
+    return null;
   }
 
   private createTray() {

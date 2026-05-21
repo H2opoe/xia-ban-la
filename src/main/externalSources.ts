@@ -1,4 +1,4 @@
-import { app } from 'electron';
+import electron from 'electron/main';
 import { execFile } from 'node:child_process';
 import { existsSync } from 'node:fs';
 import { dirname, join } from 'node:path';
@@ -18,6 +18,7 @@ import { getExternalAccessInstruction } from '../shared/externalAccessMessages.j
 import { createExternalReminderPatch, getExternalEventLinkKeys, getExternalSourceLinkKeys } from '../shared/externalReminder.js';
 import { toDateKey } from '../shared/reminderSchedule.js';
 
+const { app } = electron;
 const execFileAsync = promisify(execFile);
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const MAC_EVENTKIT_HELPER_NAME = 'eventkit-bridge';

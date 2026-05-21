@@ -1,4 +1,4 @@
-import { app, BrowserWindow, globalShortcut, ipcMain, powerMonitor, screen } from 'electron';
+import electron from 'electron/main';
 import { randomUUID } from 'node:crypto';
 import { dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -17,6 +17,8 @@ import { StatusBarEntry } from './statusBarEntry.js';
 import { ReminderStore } from './store.js';
 import { sendWindowMessage } from './windowMessenger.js';
 
+const { app, BrowserWindow, globalShortcut, ipcMain, powerMonitor, screen } = electron;
+type BrowserWindow = Electron.BrowserWindow;
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const store = new ReminderStore();
 
@@ -53,7 +55,7 @@ const menuFloating = new MenuFloatingController({
 menuPanel = new MenuPanelController({
   dirname: __dirname,
   isQuitting: () => isQuittingApp,
-  getTray: () => statusBarEntry.getTray(),
+  getStatusBarAnchorBounds: () => statusBarEntry.getAnchorBounds(),
   hasVisibleReminderOverlay: () => reminderOverlays.hasVisibleWindow(),
   broadcastOverlayVisibility: () => reminderOverlays.broadcastOverlayVisibility(),
   closeFloatingWindows: () => menuFloating.closeWindows(),
@@ -76,10 +78,35 @@ statusBarEntry = new StatusBarEntry({
 
 app.setName('下班啦');
 if (process.platform === 'darwin') {
+  // 本应用不保存网页登录态或密码；让 Chromium 使用 mock keychain，避免 Safe Storage 触发系统登录钥匙串授权弹窗。
+  app.commandLine.appendSwitch('use-mock-keychain');
   app.dock?.hide();
 }
 
+const gotSingleInstanceLock = app.requestSingleInstanceLock();
+if (!gotSingleInstanceLock) {
+  app.exit(0);
+}
+
+app.on('second-instance', () => {
+  showMainInterfaceFromSystemOpen();
+});
+
+app.on('activate', () => {
+  showMainInterfaceFromSystemOpen();
+});
+
+app.on('open-file', (event) => {
+  event.preventDefault();
+  showMainInterfaceFromSystemOpen();
+});
+
 void app.whenReady().then(async () => {
+  if (process.platform === 'darwin') {
+    // Dock 隐藏是运行时兜底；打包后的彻底隐藏由 Info.plist 的 LSUIElement 保证。
+    app.setActivationPolicy('accessory');
+    app.dock?.hide();
+  }
   await store.init();
   if (isExternalSourcesSupported()) {
     externalSyncService = new ExternalSyncService(store);
@@ -126,6 +153,7 @@ void app.whenReady().then(async () => {
   registerApplicationMenu(() => menuPanel.show());
   statusBarEntry.registerThemeIconUpdates();
   statusBarEntry.applyRuntimeIcons();
+  await statusBarEntry.waitForAnchorBounds();
   menuPanel.show();
 
   screen.on('display-added', () => broadcastReminders());
@@ -191,6 +219,19 @@ function requestAppQuit() {
   statusBarEntry.setQuitting(true);
   cleanupBeforeQuit();
   app.quit();
+}
+
+function showMainInterfaceFromSystemOpen() {
+  if (isQuittingApp || !app.isReady()) {
+    return;
+  }
+
+  if (process.platform === 'darwin') {
+    app.setActivationPolicy('accessory');
+    app.dock?.hide();
+  }
+
+  menuPanel.show();
 }
 
 function requestMenuPanelBeforeHide(windowItem: BrowserWindow) {

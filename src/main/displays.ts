@@ -1,5 +1,7 @@
-import { screen } from 'electron';
+import electron from 'electron/main';
 import type { DisplayInfo } from '../shared/types.js';
+
+const { screen } = electron;
 
 export function getDisplayInfos(): DisplayInfo[] {
   const primaryId = screen.getPrimaryDisplay().id;

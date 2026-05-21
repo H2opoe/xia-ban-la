@@ -1,7 +1,11 @@
-import { BrowserWindow, screen, type Tray } from 'electron';
+import electron, { type Tray } from 'electron/main';
 import type { MenuFloatingSurfaceRequest } from '../shared/types.js';
 import { MENU_PANEL_SIZE, MENU_SURFACE_OUTSET } from '../shared/window.js';
 import { MENU_FLOATING_HOVER_BRIDGE_PX } from './menuFloatingConfig.js';
+import type { StatusBarAnchorBounds } from './statusBarEntry.js';
+
+const { screen } = electron;
+type BrowserWindow = Electron.BrowserWindow;
 
 export function isCursorInsideWindow(windowItem: BrowserWindow) {
   const cursorPoint = screen.getCursorScreenPoint();
@@ -100,19 +104,18 @@ export function getMenuFloatingSurfaceAnchorPoint(ownerWindow: BrowserWindow, re
   };
 }
 
-export function getMenuPanelPosition(windowItem: BrowserWindow, tray: Tray | null): [number, number] {
+export function getMenuPanelPosition(windowItem: BrowserWindow, anchorBounds: StatusBarAnchorBounds | Tray | null): [number, number] {
   const windowBounds = windowItem.getBounds();
-  const trayBounds = tray?.getBounds();
-  const cursorPoint = screen.getCursorScreenPoint();
-  const anchorPoint = trayBounds
+  const statusBarBounds = getStatusBarBounds(anchorBounds);
+  const anchorPoint = statusBarBounds
     ? {
-        x: Math.round(trayBounds.x + trayBounds.width / 2),
-        y: Math.round(trayBounds.y + trayBounds.height / 2)
+        x: Math.round(statusBarBounds.x + statusBarBounds.width / 2),
+        y: Math.round(statusBarBounds.y + statusBarBounds.height / 2)
       }
-    : cursorPoint;
+    : getFallbackStatusBarAnchorPoint();
   const display = screen.getDisplayNearestPoint(anchorPoint);
   const workArea = display.workArea;
-  const hasTopMenuBar = trayBounds ? trayBounds.y <= workArea.y + 40 : anchorPoint.y <= workArea.y + 40;
+  const hasTopMenuBar = statusBarBounds ? statusBarBounds.y <= workArea.y + 40 : true;
   const visualPanelX = anchorPoint.x - Math.round(MENU_PANEL_SIZE.width / 2);
   const visualPanelY = hasTopMenuBar
     ? workArea.y + 8
@@ -129,6 +132,28 @@ export function getMenuPanelPosition(windowItem: BrowserWindow, tray: Tray | nul
   );
 
   return [x, y];
+}
+
+function getStatusBarBounds(anchorBounds: StatusBarAnchorBounds | Tray | null) {
+  if (!anchorBounds) {
+    return null;
+  }
+
+  if ('getBounds' in anchorBounds) {
+    const trayBounds = anchorBounds.getBounds();
+    return trayBounds.width > 0 && trayBounds.height > 0 ? trayBounds : null;
+  }
+
+  return anchorBounds;
+}
+
+function getFallbackStatusBarAnchorPoint() {
+  const primaryDisplay = screen.getPrimaryDisplay();
+  const workArea = primaryDisplay.workArea;
+  return {
+    x: workArea.x + workArea.width - 28,
+    y: workArea.y
+  };
 }
 
 function clamp(value: number, min: number, max: number) {

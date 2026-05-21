@@ -1,4 +1,4 @@
-import type { BrowserWindow } from 'electron';
+import type { BrowserWindow } from 'electron/main';
 import { join } from 'node:path';
 
 const isDev = Boolean(process.env.VITE_DEV_SERVER_URL);

@@ -1,4 +1,4 @@
-import { app, BrowserWindow, screen } from 'electron';
+import electron from 'electron/main';
 import { join } from 'node:path';
 import type { MenuFloatingSurfaceKind, MenuFloatingSurfaceRequest } from '../shared/types.js';
 import { MENU_SURFACE_OUTSET } from '../shared/window.js';
@@ -14,6 +14,9 @@ import {
   isCursorInsideMenuWindowBridge,
   isCursorInsideWindow
 } from './windowGeometry.js';
+
+const { app, BrowserWindow, screen } = electron;
+type BrowserWindow = Electron.BrowserWindow;
 
 type MenuFloatingControllerOptions = {
   dirname: string;

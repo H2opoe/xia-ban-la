@@ -1,4 +1,4 @@
-import type { BrowserWindow } from 'electron';
+import type { BrowserWindow } from 'electron/main';
 
 export function canSendToWindow(windowItem: BrowserWindow) {
   // Electron 的窗口关闭过程中，BrowserWindow 对象和 webContents 的销毁时序不完全同步，发送前必须同时检查。

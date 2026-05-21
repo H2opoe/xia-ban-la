@@ -1,9 +1,12 @@
-import { app, nativeImage, nativeTheme } from 'electron';
+import electronCommon from 'electron/common';
+import electron from 'electron/main';
 import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
+const { app, nativeTheme } = electron;
+const { nativeImage } = electronCommon;
 const LIGHT_APP_ICON_FILE = 'icon.png';
 const DARK_APP_ICON_FILE = 'icon-dark.png';
 const TRAY_ICON_FILE = 'tray.svg';

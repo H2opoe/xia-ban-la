@@ -1,4 +1,5 @@
-import { app, BrowserWindow, ipcMain, shell } from 'electron';
+import electron from 'electron/main';
+import electronCommon from 'electron/common';
 import { createExternalReminderPatch } from '../shared/externalReminder.js';
 import { createReminderPayload } from '../shared/reminderPayload.js';
 import type {
@@ -16,6 +17,9 @@ import type { ReminderActionSession } from './reminderActionSession.js';
 import type { ReminderScheduler } from './scheduler.js';
 import type { ReminderStore } from './store.js';
 
+const { app, BrowserWindow, ipcMain } = electron;
+const { shell } = electronCommon;
+type BrowserWindow = Electron.BrowserWindow;
 const REMINDER_PREVIEW_TEXT = '这是提醒预览';
 const ALLOWED_EXTERNAL_LINKS = new Set([
   'https://www.xiaohongshu.com/user/profile/5bed9e4201e65d00013a32bf',

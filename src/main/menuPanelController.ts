@@ -1,4 +1,4 @@
-import { app, BrowserWindow, type Tray } from 'electron';
+import electron, { type Tray } from 'electron/main';
 import { join } from 'node:path';
 import {
   MENU_PANEL_ANIMATION_MS,
@@ -10,11 +10,15 @@ import {
   getWindowSizeWithSurfaceOutset,
   isCursorInsideWindow
 } from './windowGeometry.js';
+import type { StatusBarAnchorBounds } from './statusBarEntry.js';
+
+const { app, BrowserWindow } = electron;
+type BrowserWindow = Electron.BrowserWindow;
 
 type MenuPanelControllerOptions = {
   dirname: string;
   isQuitting: () => boolean;
-  getTray: () => Tray | null;
+  getStatusBarAnchorBounds: () => StatusBarAnchorBounds | Tray | null;
   hasVisibleReminderOverlay: () => boolean;
   broadcastOverlayVisibility: () => void;
   closeFloatingWindows: () => void;
@@ -283,7 +287,7 @@ export class MenuPanelController {
 
   private showWindow(windowItem: BrowserWindow) {
     this.clearHideTimer();
-    windowItem.setPosition(...getMenuPanelPosition(windowItem, this.options.getTray()), false);
+    windowItem.setPosition(...getMenuPanelPosition(windowItem, this.options.getStatusBarAnchorBounds()), false);
     windowItem.show();
     windowItem.moveTop();
     this.options.sendWindowMessage(windowItem, 'menu-panel:did-show');

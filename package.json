@@ -65,6 +65,7 @@
       "entitlements": "native/entitlements.mac.plist",
       "entitlementsInherit": "native/entitlements.mac.plist",
       "extendInfo": {
+        "LSUIElement": true,
         "NSCalendarsFullAccessUsageDescription": "下班啦只读取日历日程，用来在本软件内同步提醒。",
         "NSCalendarsUsageDescription": "下班啦只读取日历日程，用来在本软件内同步提醒。",
         "NSRemindersFullAccessUsageDescription": "下班啦只读取提醒事项，用来在本软件内同步提醒。",

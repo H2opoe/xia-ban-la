@@ -1,5 +1,7 @@
-import { contextBridge, ipcRenderer } from 'electron';
+import electron from 'electron/renderer';
 import type { AppSettings, MenuFloatingSurfaceKind, Reminder, ReminderApi, ReminderMessage, ReminderPayload } from '../shared/types.js';
+
+const { contextBridge, ipcRenderer } = electron;
 
 const api: ReminderApi = {
   getReminders: () => ipcRenderer.invoke('reminders:get'),

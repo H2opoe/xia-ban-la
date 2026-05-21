@@ -1,4 +1,6 @@
-import { Menu } from 'electron';
+import electron from 'electron/main';
+
+const { Menu } = electron;
 
 export function registerApplicationMenu(showMenuPanel: () => void) {
   const template: Electron.MenuItemConstructorOptions[] = [
