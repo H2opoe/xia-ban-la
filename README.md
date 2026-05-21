@@ -10,7 +10,7 @@
 
 **下班啦** 是一个会用“全屏提醒”把重要时间推到你眼前的菜单栏工具。它不想替代你的待办软件，只负责一件很具体的事：到点把你从工作惯性里拉出来，提醒你该收尾、该下班、该处理那些容易忘的小事。
 
-<p align="center">
+<p align="left">
   <img src="https://raw.githubusercontent.com/H2opoe/xia-ban-la/main/docs/readme/main-light.png" alt="下班啦主界面" width="420">
 </p>
 
@@ -18,13 +18,13 @@
 
 告别角落里小小的通知。重要提醒到点后，直接用全屏浮层盖到桌面上，让你从“再忙一会儿”的状态里回到现实。
 
-<p align="center">
+<p align="left">
   <img src="https://raw.githubusercontent.com/H2opoe/xia-ban-la/main/docs/readme/fullscreen-reminder.png" alt="全屏提醒" width="760">
 </p>
 
 如果时机不对，也可以选择稍后提醒：1 分钟、5 分钟，或者自定义时间。它不是粗暴打断，而是给你一个保存文件、收尾、切换状态的缓冲。
 
-<p align="center">
+<p align="left">
   <img src="https://raw.githubusercontent.com/H2opoe/xia-ban-la/main/docs/readme/settings-lock.png" alt="提醒显示与自动熄屏" width="640">
 </p>
 
@@ -32,7 +32,7 @@
 
 主面板直接显示下班倒计时。看着时间一点点靠近，下班这件事会变得更有存在感。
 
-<p align="center">
+<p align="left">
   <img src="https://raw.githubusercontent.com/H2opoe/xia-ban-la/main/docs/readme/offwork-settings.png" alt="下班提醒设置" width="420">
 </p>
 
@@ -44,7 +44,7 @@
 
 除了下班，你还可以添加更多提醒：抢票、点外卖、拿快递、交房租、喝水走动。它们不会变成复杂清单，只是按时间出现，在你真的需要的时候提醒你。
 
-<p align="center">
+<p align="left">
   <img src="https://raw.githubusercontent.com/H2opoe/xia-ban-la/main/docs/readme/reminder-editor.png" alt="更多提醒与编辑" width="640">
 </p>
 
@@ -52,7 +52,7 @@
 
 如果你已经在 macOS 日历或提醒事项里记录了事情，下班啦可以读取并同步到列表里。会议、课程、交房租、生活提醒，不用反复切换 App，菜单栏里一眼就能看到。
 
-<p align="center">
+<p align="left">
   <img src="https://raw.githubusercontent.com/H2opoe/xia-ban-la/main/docs/readme/external-sync.png" alt="本机日程和提醒事项" width="640">
 </p>
 
@@ -62,7 +62,7 @@
 
 还可以选择提醒显示在哪个屏幕，外观跟随系统深色 / 浅色模式。平时安静待在菜单栏，需要时再展开。
 
-<p align="center">
+<p align="left">
   <img src="https://raw.githubusercontent.com/H2opoe/xia-ban-la/main/docs/readme/settings-appearance-dark.png" alt="外观设置" width="420">
 </p>
 
