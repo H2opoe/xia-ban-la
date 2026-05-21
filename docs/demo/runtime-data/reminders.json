@@ -1,0 +1,333 @@
+{
+  "reminders": [
+    {
+      "id": "default-off-work",
+      "name": "18:30 下班",
+      "createdAt": "2026-05-21T02:00:00.000Z",
+      "enabled": true,
+      "completed": false,
+      "repeatRule": "weekly",
+      "weeklyDays": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "useAlternateWeeks": true,
+      "alternateWeekDays": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "alternateNextWeekDays": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ],
+      "scheduledDate": "2026-05-21",
+      "dailyTime": "18:30",
+      "advanceMinutes": 10,
+      "repeatUntilDismissed": true,
+      "repeatIntervalMinutes": 5,
+      "messages": [
+        {
+          "id": "default_message_1",
+          "text": "洗洗水杯，准备下班",
+          "enabled": true
+        },
+        {
+          "id": "default_message_2",
+          "text": "上个厕所，准备下班",
+          "enabled": true
+        },
+        {
+          "id": "default_message_3",
+          "text": "收拾包包，准备下班",
+          "enabled": true
+        },
+        {
+          "id": "default_message_4",
+          "text": "关掉电脑，准备下班",
+          "enabled": true
+        },
+        {
+          "id": "default_message_5",
+          "text": "保存文件，准备下班",
+          "enabled": true
+        },
+        {
+          "id": "default_message_6",
+          "text": "伸个懒腰，准备下班",
+          "enabled": true
+        }
+      ],
+      "selectedDisplayIds": [
+        "demo-primary-display"
+      ],
+      "alternateWeekAnchorDate": "2026-05-21"
+    },
+    {
+      "id": "demo-order-lunch",
+      "name": "点外卖",
+      "createdAt": "2026-05-21T02:06:00.000Z",
+      "enabled": true,
+      "completed": true,
+      "repeatRule": "weekly",
+      "weeklyDays": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "useAlternateWeeks": false,
+      "alternateWeekDays": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "alternateNextWeekDays": [],
+      "scheduledDate": "2026-05-21",
+      "dailyTime": "11:10",
+      "advanceMinutes": 0,
+      "repeatUntilDismissed": false,
+      "repeatIntervalMinutes": 5,
+      "messages": [
+        {
+          "id": "demo-order-lunch-message",
+          "text": "饭点前先点好，别等电梯口才想起来",
+          "enabled": true
+        }
+      ],
+      "selectedDisplayIds": [
+        "demo-primary-display"
+      ],
+      "completedAt": "2026-05-21T03:20:05.599Z"
+    },
+    {
+      "id": "demo-flash-sale",
+      "name": "20:00 抢购护肤品",
+      "createdAt": "2026-05-21T02:08:00.000Z",
+      "enabled": true,
+      "completed": false,
+      "repeatRule": "once",
+      "weeklyDays": [
+        4
+      ],
+      "useAlternateWeeks": false,
+      "alternateWeekDays": [],
+      "alternateNextWeekDays": [],
+      "scheduledDate": "2026-05-21",
+      "dailyTime": "19:58",
+      "advanceMinutes": 2,
+      "repeatUntilDismissed": true,
+      "repeatIntervalMinutes": 1,
+      "messages": [
+        {
+          "id": "demo-flash-sale-message",
+          "text": "提前打开购物车，别错过满减",
+          "enabled": true
+        }
+      ],
+      "selectedDisplayIds": [
+        "demo-primary-display"
+      ]
+    },
+    {
+      "id": "demo-concert-ticket",
+      "name": "抢演唱会票",
+      "createdAt": "2026-05-21T02:10:00.000Z",
+      "enabled": true,
+      "completed": true,
+      "repeatRule": "once",
+      "weeklyDays": [
+        5
+      ],
+      "useAlternateWeeks": false,
+      "alternateWeekDays": [],
+      "alternateNextWeekDays": [],
+      "scheduledDate": "2026-05-21",
+      "dailyTime": "11:58",
+      "advanceMinutes": 5,
+      "repeatUntilDismissed": true,
+      "repeatIntervalMinutes": 1,
+      "messages": [
+        {
+          "id": "demo-concert-ticket-message",
+          "text": "检查账号、收货地址和支付方式",
+          "enabled": true
+        }
+      ],
+      "selectedDisplayIds": [
+        "demo-primary-display"
+      ],
+      "completedAt": "2026-05-21T03:20:00.782Z"
+    },
+    {
+      "id": "demo-alternate-week-report",
+      "name": "大小周周报",
+      "createdAt": "2026-05-21T02:12:00.000Z",
+      "enabled": true,
+      "completed": true,
+      "repeatRule": "weekly",
+      "weeklyDays": [
+        5
+      ],
+      "useAlternateWeeks": true,
+      "alternateWeekAnchorDate": "2026-05-21",
+      "alternateWeekDays": [
+        5
+      ],
+      "alternateNextWeekDays": [
+        6
+      ],
+      "scheduledDate": "2026-05-21",
+      "dailyTime": "17:45",
+      "advanceMinutes": 15,
+      "repeatUntilDismissed": false,
+      "repeatIntervalMinutes": 5,
+      "messages": [
+        {
+          "id": "demo-alternate-week-report-message",
+          "text": "这周要按大小周安排提交周报",
+          "enabled": true
+        }
+      ],
+      "selectedDisplayIds": [
+        "demo-primary-display"
+      ],
+      "completedAt": "2026-05-21T03:20:13.064Z"
+    },
+    {
+      "id": "demo-calendar-product-meeting",
+      "name": "产品晨会",
+      "createdAt": "2026-05-21T02:14:00.000Z",
+      "enabled": true,
+      "completed": false,
+      "repeatRule": "once",
+      "weeklyDays": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "useAlternateWeeks": false,
+      "alternateWeekDays": [],
+      "alternateNextWeekDays": [],
+      "scheduledDate": "2026-05-21",
+      "dailyTime": "09:30",
+      "advanceMinutes": 10,
+      "repeatUntilDismissed": false,
+      "repeatIntervalMinutes": 5,
+      "messages": [
+        {
+          "id": "demo-calendar-product-meeting-message",
+          "text": "同步自本机日历：带上昨天下午的需求记录",
+          "enabled": true
+        }
+      ],
+      "selectedDisplayIds": [
+        "demo-primary-display"
+      ],
+      "linkedExternalSource": {
+        "provider": "macos-calendar",
+        "externalId": "demo-calendar-product-meeting",
+        "seriesId": "demo-calendar-product-meeting-series",
+        "title": "产品晨会",
+        "isRecurring": true,
+        "lastSyncedAt": "2026-05-21T03:36:44.103Z",
+        "syncStatus": "ok"
+      }
+    },
+    {
+      "id": "demo-macos-reminder-rent",
+      "name": "交房租",
+      "createdAt": "2026-05-21T02:16:00.000Z",
+      "enabled": true,
+      "completed": false,
+      "repeatRule": "once",
+      "weeklyDays": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "useAlternateWeeks": false,
+      "alternateWeekDays": [],
+      "alternateNextWeekDays": [],
+      "scheduledDate": "2026-05-21",
+      "dailyTime": "21:00",
+      "advanceMinutes": 30,
+      "repeatUntilDismissed": true,
+      "repeatIntervalMinutes": 10,
+      "messages": [
+        {
+          "id": "demo-macos-reminder-rent-message",
+          "text": "同步自本机提醒事项：记得截图留底",
+          "enabled": true
+        }
+      ],
+      "selectedDisplayIds": [
+        "demo-primary-display"
+      ],
+      "linkedExternalSource": {
+        "provider": "macos-reminders",
+        "externalId": "demo-macos-reminder-rent",
+        "title": "交房租",
+        "isRecurring": false,
+        "lastSyncedAt": "2026-05-21T03:36:44.103Z",
+        "syncStatus": "ok"
+      }
+    }
+  ],
+  "defaultMessages": [
+    {
+      "id": "default_message_1",
+      "text": "洗洗水杯，准备下班",
+      "enabled": true
+    },
+    {
+      "id": "default_message_2",
+      "text": "上个厕所，准备下班",
+      "enabled": true
+    },
+    {
+      "id": "default_message_3",
+      "text": "收拾包包，准备下班",
+      "enabled": true
+    },
+    {
+      "id": "default_message_4",
+      "text": "关掉电脑，准备下班",
+      "enabled": true
+    },
+    {
+      "id": "default_message_5",
+      "text": "保存文件，准备下班",
+      "enabled": true
+    },
+    {
+      "id": "default_message_6",
+      "text": "伸个懒腰，准备下班",
+      "enabled": true
+    }
+  ],
+  "settings": {
+    "lockScreenAfterIdle": true,
+    "selectedDisplayIds": [
+      "demo-primary-display"
+    ],
+    "themeMode": "system"
+  },
+  "exampleMoreRemindersSeeded": true
+}
