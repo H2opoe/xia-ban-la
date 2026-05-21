@@ -24,16 +24,12 @@
 
 如果时机不对，也可以选择稍后提醒：1 分钟、5 分钟，或者自定义时间。它不是粗暴打断，而是给你一个保存文件、收尾、切换状态的缓冲。
 
-<p align="left">
-  <img src="https://raw.githubusercontent.com/H2opoe/xia-ban-la/main/docs/readme/settings-lock.png" alt="提醒显示与自动熄屏" width="640">
-</p>
-
 ## 下班提醒，不只是一个闹钟
 
 主面板直接显示下班倒计时。看着时间一点点靠近，下班这件事会变得更有存在感。
 
 <p align="left">
-  <img src="https://raw.githubusercontent.com/H2opoe/xia-ban-la/main/docs/readme/offwork-settings.png" alt="下班提醒设置" width="420">
+  <img src="https://raw.githubusercontent.com/H2opoe/xia-ban-la/main/docs/readme/settings-appearance-dark.png" alt="外观设置" width="420">
 </p>
 
 你可以设置固定下班时间、提前多久提醒、每周哪几天重复。它还支持大小周：本周和下周的上班日可以分别设置，不管排班多别扭，都能贴合真实节奏。
@@ -63,7 +59,13 @@
 还可以选择提醒显示在哪个屏幕，外观跟随系统深色 / 浅色模式。平时安静待在菜单栏，需要时再展开。
 
 <p align="left">
-  <img src="https://raw.githubusercontent.com/H2opoe/xia-ban-la/main/docs/readme/settings-appearance-dark.png" alt="外观设置" width="420">
+  <img src="https://raw.githubusercontent.com/H2opoe/xia-ban-la/main/docs/readme/settings-lock.png" alt="提醒显示与自动熄屏" width="640">
+</p>
+
+## 支持深色/浅色模式
+
+<p align="left">
+  <img src="https://raw.githubusercontent.com/H2opoe/xia-ban-la/main/docs/readme/offwork-settings.png" alt="下班提醒设置" width="420">
 </p>
 
 ## 用它守住这些时刻
