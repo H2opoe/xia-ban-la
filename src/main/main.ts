@@ -1,6 +1,6 @@
 import electron from 'electron/main';
 import { randomUUID } from 'node:crypto';
-import { dirname, resolve } from 'node:path';
+import { dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import type { Reminder, ReminderPayload } from '../shared/types.js';
 import { registerApplicationMenu } from './applicationMenu.js';
@@ -77,9 +77,6 @@ statusBarEntry = new StatusBarEntry({
 });
 
 app.setName('下班啦');
-if (process.env.XIABANLA_USER_DATA_DIR) {
-  app.setPath('userData', resolve(process.env.XIABANLA_USER_DATA_DIR));
-}
 if (process.platform === 'darwin') {
   // 本应用不保存网页登录态或密码；让 Chromium 使用 mock keychain，避免 Safe Storage 触发系统登录钥匙串授权弹窗。
   app.commandLine.appendSwitch('use-mock-keychain');

@@ -25,10 +25,6 @@ const MAC_EVENTKIT_HELPER_NAME = 'eventkit-bridge';
 const MAC_EVENTKIT_HELPER_TIMEOUT_MS = 60_000;
 
 export async function listExternalEvents(): Promise<ExternalEventListResult> {
-  if (isDemoExternalSourcesEnabled()) {
-    return createDemoExternalEventResult();
-  }
-
   if (isExternalSourcesSupported()) {
     return listMacEvents();
   }
@@ -46,7 +42,7 @@ export async function listExternalEvents(): Promise<ExternalEventListResult> {
 }
 
 export function isExternalSourcesSupported() {
-  return process.platform === 'darwin' || isDemoExternalSourcesEnabled();
+  return process.platform === 'darwin';
 }
 
 export async function syncExternalSources(reminders: Reminder[]): Promise<{ reminders: Reminder[]; result: SyncResult }> {
@@ -181,65 +177,6 @@ async function listMacEvents(): Promise<ExternalEventListResult> {
   } catch (error) {
     return createFailureResult(getMacEventKitErrorMessage(error));
   }
-}
-
-function isDemoExternalSourcesEnabled() {
-  return process.env.XIABANLA_DEMO_EXTERNAL === '1';
-}
-
-function createDemoExternalEventResult(): ExternalEventListResult {
-  const today = toDateKey(new Date());
-  return {
-    events: [
-      {
-        id: 'demo-calendar-product-meeting',
-        seriesId: 'demo-calendar-product-meeting-series',
-        provider: 'macos-calendar',
-        title: '产品晨会',
-        startTime: `${today}T09:30:00+08:00`,
-        isRecurring: true
-      },
-      {
-        id: 'demo-calendar-standup',
-        provider: 'macos-calendar',
-        title: '部门站会',
-        startTime: `${today}T14:00:00+08:00`,
-        isRecurring: true
-      },
-      {
-        id: 'demo-calendar-gym',
-        provider: 'macos-calendar',
-        title: '下班后瑜伽课',
-        startTime: `${today}T19:30:00+08:00`
-      },
-      {
-        id: 'demo-macos-reminder-rent',
-        provider: 'macos-reminders',
-        title: '交房租',
-        startTime: `${today}T21:00:00+08:00`,
-        completed: false
-      },
-      {
-        id: 'demo-macos-reminder-takeout-coupon',
-        provider: 'macos-reminders',
-        title: '领外卖红包',
-        startTime: `${today}T10:55:00+08:00`,
-        completed: false
-      },
-      {
-        id: 'demo-macos-reminder-pack',
-        provider: 'macos-reminders',
-        title: '带充电器回家',
-        startTime: `${today}T18:20:00+08:00`,
-        completed: false
-      }
-    ],
-    access: [
-      createAccess('calendar', 'authorized', true),
-      createAccess('reminders', 'authorized', true)
-    ],
-    message: '已读取 demo 本机日程和提醒事项'
-  };
 }
 
 function getMacEventKitHelperPath() {

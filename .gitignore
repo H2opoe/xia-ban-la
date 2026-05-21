@@ -9,8 +9,7 @@ release/
 
 tmp/
 
-docs/demo/runtime-data/*
-!docs/demo/runtime-data/reminders.json
+docs/demo/
 
 *.log
 npm-debug.log*

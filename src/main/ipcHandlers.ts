@@ -153,12 +153,10 @@ export function registerIpcHandlers(deps: RegisterIpcHandlersDeps) {
       repeatUntilDismissed: false
     };
     const displays = selectDisplays();
-    const payload = process.env.XIABANLA_USER_DATA_DIR
-      ? createReminderPayload(previewReminder)
-      : createReminderPayload(previewReminder, new Date(), {
-        title: REMINDER_PREVIEW_TEXT,
-        message: REMINDER_PREVIEW_TEXT
-      });
+    const payload = createReminderPayload(previewReminder, new Date(), {
+      title: REMINDER_PREVIEW_TEXT,
+      message: REMINDER_PREVIEW_TEXT
+    });
 
     reminderActionSession.registerPreview(previewReminder.id, reminder.id);
     await showReminderWindows(previewReminder, { displays, payload });

@@ -3,8 +3,6 @@ import { createRoot } from 'react-dom/client';
 import type { MenuFloatingSurfaceKind } from '../shared/types';
 import { MENU_PANEL_SIZE, MENU_SURFACE_OUTSET } from '../shared/window';
 import { ReminderOverlay } from './components/ReminderOverlay';
-import { DemoScreenshotScene } from './demo/DemoScreenshotScene';
-import { installBrowserDemoApi } from './demo/browserDemoApi';
 import { FloatingSurfaceApp } from './features/floatingSurfaces/FloatingSurfaceApp';
 import { SettingsApp } from './features/menuPanel/MenuPanel';
 import './styles.css';
@@ -18,7 +16,6 @@ type FloatingRoute = {
 function App() {
   const [routeHash, setRouteHash] = useState(() => window.location.hash);
   const isReminderRoute = routeHash === '#/reminder';
-  const demoShotParams = getDemoShotParams(routeHash);
   const floatingRoute = getFloatingRoute(routeHash);
 
   useEffect(() => {
@@ -31,9 +28,8 @@ function App() {
   }, []);
 
   useEffect(() => {
-    document.body.classList.toggle('menu-preview-route', !isReminderRoute && !floatingRoute && !demoShotParams);
+    document.body.classList.toggle('menu-preview-route', !isReminderRoute && !floatingRoute);
     document.body.classList.toggle('menu-floating-route', Boolean(floatingRoute));
-    document.body.classList.toggle('demo-screenshot-route', Boolean(demoShotParams));
     document.body.style.setProperty('--menu-panel-width', `${MENU_PANEL_SIZE.width}px`);
     document.body.style.setProperty('--menu-panel-height', `${MENU_PANEL_SIZE.height}px`);
     document.body.style.setProperty('--surface-outset', `${MENU_SURFACE_OUTSET}px`);
@@ -41,16 +37,11 @@ function App() {
     return () => {
       document.body.classList.remove('menu-preview-route');
       document.body.classList.remove('menu-floating-route');
-      document.body.classList.remove('demo-screenshot-route');
       document.body.style.removeProperty('--menu-panel-width');
       document.body.style.removeProperty('--menu-panel-height');
       document.body.style.removeProperty('--surface-outset');
     };
-  }, [demoShotParams, floatingRoute, isReminderRoute]);
-
-  if (demoShotParams) {
-    return <DemoScreenshotScene params={demoShotParams} />;
-  }
+  }, [floatingRoute, isReminderRoute]);
 
   if (isReminderRoute) {
     return <ReminderOverlay />;
@@ -61,11 +52,6 @@ function App() {
   }
 
   return <SettingsApp />;
-}
-
-function getDemoShotParams(routeHash: string) {
-  const match = /^#\/demo-shot(?:\?(.*))?$/.exec(routeHash);
-  return match ? new URLSearchParams(match[1] || '') : null;
 }
 
 function getFloatingRoute(routeHash: string): FloatingRoute | null {
@@ -82,8 +68,6 @@ function getFloatingRoute(routeHash: string): FloatingRoute | null {
     restoreTitle: params.get('restoreTitle') ?? undefined
   };
 }
-
-installBrowserDemoApi();
 
 createRoot(document.getElementById('root')!).render(
   <React.StrictMode>

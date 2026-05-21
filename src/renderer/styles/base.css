@@ -43,11 +43,6 @@ body.menu-floating-route {
   overscroll-behavior: contain;
 }
 
-body.demo-screenshot-route {
-  width: 100vw;
-  height: 100vh;
-}
-
 button,
 input,
 select {
